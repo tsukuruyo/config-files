@@ -10,8 +10,6 @@ current_dir=$(echo "$input" | jq -r '.worktree.original_cwd // empty')
 pr_number=$(echo "$input" | jq -r '.pr.number // empty')
 rl_5h_pct=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' | awk '{printf "%.0f", $1}')
 rl_5h_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
-rl_7d_pct=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
-rl_7d_reset=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 version=$(echo "$input" | jq -r '.version // empty')
 
 if [ -n "$used" ]; then
@@ -40,8 +38,8 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
   modified=$(git diff --numstat 2>/dev/null | wc -l | tr -d ' ')
 
   git_str="$branch"
-  [ "$staged" -gt 0 ] && git_str="${git_str} $(printf "${GREEN}+${staged}${RESET}")"
-  [ "$modified" -gt 0 ] && git_str="${git_str} $(printf "${YELLOW}~${modified}${RESET}")"
+  [ "$staged" -gt 0 ] && git_str="${git_str} $(printf '%b+%s%b' "$GREEN" "$staged" "$RESET")"
+  [ "$modified" -gt 0 ] && git_str="${git_str} $(printf '%b~%s%b' "$YELLOW" "$modified" "$RESET")"
 else
   git_str="no branch"
 fi
@@ -54,18 +52,6 @@ else
   block_str="\$0.00"
 fi
 
-make_bar() {
-  pct="$1"
-  width=10
-  filled=$(( pct * width / 100 ))
-  empty=$(( width - filled ))
-  bar=""
-  i=0
-  while [ $i -lt $filled ]; do bar="${bar}█"; i=$(( i + 1 )); done
-  while [ $i -lt $width ];  do bar="${bar}░"; i=$(( i + 1 )); done
-  printf "%s" "$bar"
-}
-
 format_rl() {
   pct="$1"
   reset_ts="$2"
@@ -76,13 +62,11 @@ format_rl() {
   else color="$GREEN"
   fi
   reset_time=$(date -r "$reset_ts" "+%H:%M" 2>/dev/null || date -d "@$reset_ts" "+%H:%M" 2>/dev/null)
-  #bar=$(make_bar "$pct")
   printf "${color}${label} ${pct}%% resets ${reset_time}${RESET}"
 }
 
 rate_limit_str=""
 rate_limit_str="${rate_limit_str}$(format_rl "$rl_5h_pct" "$rl_5h_reset" "5h")"
-# rate_limit_str="${rate_limit_str}$(format_rl "$rl_7d_pct" "$rl_7d_reset" "7d")"
 
 repo_root=$(cd "$current_dir" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "$current_dir")
 dir_display=$(basename "$repo_root")

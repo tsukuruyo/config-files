@@ -30,6 +30,7 @@ adopt = true
 "brew:just" = "latest"
 "brew:lazygit" = "latest"
 "brew:sheldon" = "latest"
+"brew:shellcheck" = "latest"
 "brew:sops" = "latest"
 "brew:starship" = "latest"
 

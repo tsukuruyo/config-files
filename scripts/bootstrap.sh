@@ -57,4 +57,5 @@ if [ ! -e "$config_dir/miserc.local.toml" ]; then
 fi
 
 echo 'Load brew into this shell, then run ~/.local/bin/mise bootstrap:'
+# shellcheck disable=SC2016 # printed for the user to run, not expanded here
 echo '  eval "$(/opt/homebrew/bin/brew shellenv)"'

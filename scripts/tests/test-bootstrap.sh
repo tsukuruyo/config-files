@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Run bootstrap.sh and mise against a throwaway HOME and check the result.
 # Usage: scripts/tests/test-bootstrap.sh
+# Patterns grep for literal shell code ($HOME and all), and messages name paths as ~/...
+# shellcheck disable=SC2016,SC2088
 set -euo pipefail
 
 repo=$(cd "$(dirname "$0")/../.." && pwd -P)
@@ -162,8 +164,8 @@ grep -qx 'export HOMEBREW_NO_INSTALL_UPGRADE=1' "$repo/.zshrc" ||
 # A Mac without some tool must still start a shell cleanly.
 unguarded=$(grep -nE '^\s*(\.|source) ' "$repo/.zshrc" || true)
 [[ -z $unguarded ]] || fail ".zshrc reads a file without checking it exists: $unguarded"
-grep -qF 'if [[ -x "${HOME}/.local/bin/mise" ]]; then' "$repo/.zshrc" &&
-  grep -qF 'eval "$("${HOME}/.local/bin/mise" activate zsh)"' "$repo/.zshrc" ||
+{ grep -qF 'if [[ -x "${HOME}/.local/bin/mise" ]]; then' "$repo/.zshrc" &&
+  grep -qF 'eval "$("${HOME}/.local/bin/mise" activate zsh)"' "$repo/.zshrc"; } ||
   fail ".zshrc does not activate the mise.run install of mise only when it exists"
 # cdr writes ~/.cache/chpwd-recent-dirs without creating ~/.cache.
 grep -qF 'mkdir -p "${HOME}/.cache"' "$repo/.zshrc" || fail ".zshrc does not create ~/.cache for cdr"
@@ -233,8 +235,8 @@ grep -qF '"brew:jq"' "$repo/mise/config.toml" || fail "statusline.sh needs jq, w
 live=$home/.codex/config.toml
 [[ -f $live && ! -L $live ]] || fail "~/.codex/config.toml is not a regular file"
 grep -qx 'followUpQueueMode = "steer"' "$live" 2>/dev/null || fail "~/.codex/config.toml did not get the shared [desktop] keys"
-grep -qx 'notify = \["codex-notify"\]' "$live" 2>/dev/null &&
-  grep -qx '\[mcp_servers.node_repl\]' "$live" 2>/dev/null ||
+{ grep -qx 'notify = \["codex-notify"\]' "$live" 2>/dev/null &&
+  grep -qx '\[mcp_servers.node_repl\]' "$live" 2>/dev/null; } ||
   fail "~/.codex/config.toml lost what Codex wrote there"
 grep -qE '^(notify|\[mcp_servers|\[plugins|\[marketplaces)|/Users/' "$repo/codex/config.toml" 2>/dev/null &&
   fail "codex/config.toml holds what Codex writes for itself"
@@ -327,6 +329,26 @@ for host in github.com bitbucket.org gitlab.com example.com; do
   grep -qx 'serveraliveinterval 10' <<<"$resolved" || fail "ssh $host sends no keepalive every 10s"
   grep -qx 'serveralivecountmax 12' <<<"$resolved" || fail "ssh $host does not give up after 12 missed keepalives"
 done
+
+# --- tasks ------------------------------------------------------------------
+
+# This repository's tasks are make's: make is on a new Mac from the start, while just
+# (installed for other repositories) only arrives with mise bootstrap.
+[[ ! -e $repo/justfile ]] || fail "justfile exists; this repository's tasks belong in the Makefile"
+[[ $(sed -n 's/^\([a-z][a-z-]*\):.*/\1/p' "$repo/Makefile" | sort | tr '\n' ' ') == "bootstrap lint plan status sync " ]] ||
+  fail "Makefile does not have exactly bootstrap, lint, plan, status and sync"
+grep -qx '\.PHONY: bootstrap lint plan status sync' "$repo/Makefile" || fail "Makefile targets are not all .PHONY"
+grep -qF '"brew:shellcheck"' "$repo/mise/config.toml" || fail "make lint needs shellcheck, which nothing installs"
+# What each target would run, without running it.
+dry() { make -s -C "$repo" -n "$1" 2>/dev/null || true; }
+[[ $(dry plan) == 'mise bootstrap --dry-run' ]] || fail "make plan does not dry-run mise bootstrap"
+[[ $(dry status) == 'mise bootstrap status' ]] || fail "make status does not show mise bootstrap status"
+[[ $(dry sync) == $'git pull\nmise bootstrap' ]] || fail "make sync does not pull and then bootstrap"
+lint=$(dry lint)
+for script in scripts/bootstrap.sh scripts/tests/test-bootstrap.sh claude/statusline.sh; do
+  grep -q "^shellcheck .*$script" <<<"$lint" || fail "make lint does not shellcheck $script"
+done
+grep -q '^gitleaks ' <<<"$lint" || fail "make lint does not look for secrets"
 
 if ((failures > 0)); then
   echo "$failures check(s) failed"

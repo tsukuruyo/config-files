@@ -18,13 +18,15 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 
 ## 日々の同期
 
-- `git pull` してから `mise bootstrap` を実行する。宣言との差分だけが適用される
+- `make sync` を実行する。`git pull` してから `mise bootstrap` を実行し、宣言との差分だけが適用される
+- `make plan` で、`mise bootstrap` が何を変えるかを実行前に確かめられる。`make status` で、それぞれの部分の状態を見られる
+- コミットする前に `make lint` を実行する。shellcheckでシェルスクリプトを検査し、gitleaksで作業ツリーに秘密がないかを探す
 
 ## 構成
 
 | ファイル | 役割 |
 | --- | --- |
-| `Makefile` | `make bootstrap` だけを持つ。新しいMacで最初から使えるタスクランナーはmakeだけのため |
+| `Makefile` | このリポジトリのタスク（`bootstrap`・`plan`・`status`・`sync`・`lint`）。新しいMacで最初から使えるタスクランナーはmakeだけなので、justfileではなくmakeにする。`brew:just` は、ほかのリポジトリで使うために入れている |
 | `scripts/bootstrap.sh` | Homebrew・mise・Orcaを入れ、`mise/` を `~/.config/mise` にリンクする |
 | `mise/config.toml` | すべてのMacで共通の設定 |
 | `mise/config.personal.toml` | 私物Macだけの設定 |
