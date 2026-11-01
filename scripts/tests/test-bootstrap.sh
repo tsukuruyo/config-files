@@ -247,6 +247,9 @@ grep -qF 'if [[ -d "${HOME}/.lmstudio/bin" ]]; then' "$repo/.zshrc" ||
   fail ".zshrc adds LM Studio's bin to PATH without checking it exists"
 grep -qx 'export HOMEBREW_NO_INSTALL_UPGRADE=1' "$repo/.zshrc" ||
   fail ".zshrc lets brew install upgrade what is already installed"
+# Settings for one Mac go in ~/.zshrc.local, sourced last so they can override the shared ones.
+[[ $(grep -v '^[[:space:]]*#' "$repo/.zshrc" | grep -v '^[[:space:]]*$' | tail -3 | head -1) == *'.zshrc.local'* ]] ||
+  fail ".zshrc does not source ~/.zshrc.local at the end"
 
 # A Mac without some tool must still start a shell cleanly.
 # A sourced file is checked with -f on the line before, or inline as `[[ -f f ]] && . f`.

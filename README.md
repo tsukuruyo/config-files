@@ -52,7 +52,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `.gitconfig` | `~/.gitconfig` にリンクする。Macごとの設定は `~/.gitconfig.local` と `~/.gitconfig.work` に書く。最後でincludeするので、共通の設定をMacごとに上書きできる。diffはdelta（`brew:git-delta`）で表示する |
 | `git/ignore` | gitのグローバルなignore。gitが既定で読む `~/.config/git/ignore` にリンクする |
 | `lazygit/config.yml` | `~/Library/Application Support/lazygit/config.yml` にリンクする。裏でのfetchはBitwardenの承認を毎回求めるので、`git.autoFetch` を止めている。diffはdeltaで表示する |
-| `.zshrc` | `~/.zshrc` にリンクする。すべてのMacで共通。miseのactivateもここで行うので、`mise` はシェルからそのまま使える |
+| `.zshrc` | `~/.zshrc` にリンクする。すべてのMacで共通。Macごとの設定は `~/.zshrc.local` に書く。最後に読み込むので、共通の設定を上書きできる。miseのactivateもここで行うので、`mise` はシェルからそのまま使える |
 | `sheldon/plugins.toml` | zshのプラグイン。`~/.config/sheldon/plugins.toml` にリンクする。シェルの中で動くので、それぞれをタグかコミットに固定し、更新するときは固定を書き換える |
 | `starship/starship.toml` | プロンプトの設定。`~/.config/starship.toml` にリンクする |
 | `ghostty/config` | ターミナル（Ghostty）の設定。`~/.config/ghostty/config` にリンクする。使っているフォントはcaskで入れる |

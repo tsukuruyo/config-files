@@ -85,6 +85,10 @@ zstyle ':zle:*' word-chars " /=;@:{},|"
 zstyle ':zle:*' word-style unspecified
 
 # completion
+# Docker Desktop が置く docker の補完は compinit より前に fpath へ入れる
+if [[ -d "${HOME}/.docker/completions" ]]; then
+  fpath=("${HOME}/.docker/completions" $fpath)
+fi
 autoload -Uz compinit
 # キャッシュ（~/.zcompdump）は1日1回だけ作り直し、そのときは compaudit で
 # 補完関数のディレクトリが他人に書き換えられないかも確かめる。それ以外は速さを優先する
@@ -198,4 +202,11 @@ fi
 # --------------------------------------------------------------------------------
 if [[ -x "${HOME}/.local/bin/mise" ]]; then
   eval "$("${HOME}/.local/bin/mise" activate zsh)"
+fi
+
+# --------------------------------------------------------------------------------
+# Macごとの設定（最後に読み込むので、ここまでの設定を上書きできる）
+# --------------------------------------------------------------------------------
+if [[ -f "${HOME}/.zshrc.local" ]]; then
+  . "${HOME}/.zshrc.local"
 fi
