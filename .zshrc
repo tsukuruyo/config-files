@@ -42,6 +42,7 @@ alias cx='\codex'
 alias d='\docker'
 alias g='\git'
 alias kc='\kubectl'
+alias lg='\lazygit'
 alias ls='\ls -GF --color'
 alias pn='\pnpm'
 
