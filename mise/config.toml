@@ -39,3 +39,7 @@ adopt = true
 # App Store
 "brew:mas" = "latest"
 "mas:497799835" = "latest" # Xcode
+
+[dotfiles]
+"~/.gitconfig" = { source = "~/development/config-files/.gitconfig" }
+"~/.config/git/ignore" = { source = "~/development/config-files/git/ignore" }

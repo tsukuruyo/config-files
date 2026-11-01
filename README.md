@@ -9,6 +9,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - `make bootstrap PROFILE=personal` か `make bootstrap PROFILE=work` を実行する。最後に表示されるコマンドを実行して、今のシェルにbrewのPATHを通す
 - App StoreにApple Accountでサインインしておく。`mas:` の項目（Xcodeなど）は `mas` で入れるため、サインインが必要
 - `~/.local/bin/mise bootstrap` を実行する。`brew:mas` が入ると同じ実行の中で `mas:` の項目も入る。最後のfollow-upに `mas: ... skipped (mas not found)` と出るのは実行前の予定がそのまま表示されたもので、途中に `mise mas:` の行が出ていれば問題ない
+- ~/.gitconfig.localに `[user]` の `name` と `email` を書く。公開リポジトリなので.gitconfigには書かず、.gitconfigの最後でincludeする。仕事用Macだけの設定は~/.gitconfig.workに書く
 - BitwardenにログインしてSSH agentを有効化し、~/.ssh/configの先頭に `Include ~/development/config-files/ssh/config` を書く
 - originをSSHに切り替える（`git remote set-url origin git@github.com:tsukuruyo/config-files.git`）
 
@@ -27,6 +28,8 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `mise/config.work.toml` | 仕事Macだけの設定。公開リポジトリなので社内ツールの名前などは書かない |
 | `~/.config/mise/miserc.local.toml` | Macごとにenvを選ぶ。`scripts/bootstrap.sh` が最初に1回だけ書き、Git管理しない |
 | `ssh/config` | SSHのホスト設定。`~/.ssh/config` からIncludeする |
+| `.gitconfig` | `~/.gitconfig` にリンクする。Macごとの設定は `~/.gitconfig.local` と `~/.gitconfig.work` に書く。最後でincludeするので、共通の設定をMacごとに上書きできる |
+| `git/ignore` | gitのグローバルなignore。gitが既定で読む `~/.config/git/ignore` にリンクする |
 
 ## パッケージ
 

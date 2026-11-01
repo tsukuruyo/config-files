@@ -113,6 +113,68 @@ for env in personal work; do
   grep -q "config.$other.toml" <<<"$loaded" && fail "env $env also loads config.$other.toml"
 done
 
+# --- dotfiles ---------------------------------------------------------------
+
+# [dotfiles] sources name ~/development/config-files, so put the repo there.
+mkdir -p "$home/development"
+ln -s "$repo" "$home/development/config-files"
+applied=$(HOME=$home MISE_DATA_DIR=$work/data MISE_CACHE_DIR=$work/cache MISE_STATE_DIR=$work/state \
+  "$mise_bin" bootstrap --only dotfiles --yes 2>&1) || fail "mise bootstrap --only dotfiles failed: $applied"
+for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore; do
+  target=$home/${pair%%:*} source=$repo/${pair#*:}
+  [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$source" ]] ||
+    fail "~/${pair%%:*} is not linked to ${pair#*:}"
+done
+
+# git as it would run in that HOME, with no outside config leaking in.
+home_git() {
+  env -u GIT_CONFIG_GLOBAL -u XDG_CONFIG_HOME HOME="$home" GIT_CONFIG_NOSYSTEM=1 git "$@"
+}
+# grep.lineNumber is true in .gitconfig; the local file turns it off.
+printf '[user]\n\temail = local@example.com\n[grep]\n\tlineNumber = false\n' >"$home/.gitconfig.local"
+# Without --global, as git itself looks it up (--global alone skips includes).
+[[ $(home_git -C "$work" config user.email) == local@example.com ]] ||
+  fail ".gitconfig does not include ~/.gitconfig.local"
+[[ $(home_git -C "$work" config grep.lineNumber) == false ]] ||
+  fail "~/.gitconfig.local cannot override a setting in .gitconfig"
+# One [include], last, with paths under ~ so the link to this repo is not followed.
+[[ $(grep -c '^\[include\]' "$repo/.gitconfig") == 1 && $(grep '^\[' "$repo/.gitconfig" | tail -1) == '[include]' ]] ||
+  fail ".gitconfig does not have a single [include] at the end"
+grep -qE '^\s*path = [^~]' "$repo/.gitconfig" && fail ".gitconfig includes a path not under ~"
+# This repository is public: who I am stays in ~/.gitconfig.local.
+grep -q '^\[user\]' "$repo/.gitconfig" && fail ".gitconfig declares [user]"
+# The global ignore is git's default ~/.config/git/ignore, so no core.excludesfile.
+[[ -z $(home_git -C "$work" config core.excludesfile || true) ]] ||
+  fail ".gitconfig sets core.excludesfile instead of using ~/.config/git/ignore"
+home_git init -q "$work/ignore-repo"
+touch "$work/ignore-repo/.DS_Store"
+home_git -C "$work/ignore-repo" check-ignore -q .DS_Store || fail "git does not ignore .DS_Store globally"
+# Only files that are junk everywhere are ignored globally; a repository's tmp/ is not.
+home_git -C "$work/ignore-repo" check-ignore -q tmp/x && fail "tmp/ is ignored in every repository"
+
+# Settings taken from shibayu36/config-file, as git resolves them.
+for pair in \
+  pull.rebase=true pull.autoStash=true branch.autoSetupRebase=always \
+  rebase.autoSquash=true rebase.autoStash=true \
+  merge.conflictStyle=zdiff3 push.default=current \
+  diff.colorMoved=default core.quotePath=false \
+  color.ui=auto color.diff=auto color.status=auto color.branch=auto; do
+  key=${pair%%=*} want=${pair#*=}
+  # git config exits 1 for an unset key; that is a failed check, not a crash.
+  got=$(home_git -C "$work" config "$key" || true)
+  [[ $got == "$want" ]] || fail "git config $key is '$got', want '$want'"
+done
+[[ -z $(home_git -C "$work" config merge.ff || true) ]] || fail "merge.ff is set; it was left at git's default"
+# Only gh answers for github.com: the empty helper drops osxkeychain there.
+helpers=$(home_git -C "$work" config --get-all credential.https://github.com.helper || true)
+[[ $helpers == $'\n!/opt/homebrew/bin/gh auth git-credential' ]] ||
+  fail "github.com HTTPS credentials do not come only from gh: $helpers"
+# Elsewhere osxkeychain comes from git's own gitconfig (system config is off here).
+others=$(home_git -C "$work" config --get-urlmatch credential.helper https://example.com || true)
+[[ -z $others ]] || fail ".gitconfig adds a credential helper for every host: $others"
+# column.diff is not a git setting; diff colors belong to [color].
+[[ -z $(home_git -C "$work" config column.diff || true) ]] || fail "diff is set under [column] instead of [color]"
+
 # --- ssh --------------------------------------------------------------------
 
 # ~/.ssh/config is not managed here; README.md has it include ssh/config first.

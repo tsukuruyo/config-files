@@ -1,0 +1,67 @@
+[core]
+	autocrlf = false
+	quotepath = false
+[column]
+	ui = auto
+[color]
+	ui = auto
+	diff = auto
+	status = auto
+	branch = auto
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[diff]
+	colorMoved = default
+[alias]
+	b = branch
+	cm = commit
+	co = checkout
+	d = diff
+	dc = diff --cached
+	f = fetch --tags -f
+	l = log --graph --date-order --all --name-status --pretty=format:'%h %Cred%d %Cgreen%ad %Cblue%cn %Creset%s' --date=short
+	l1 = log --oneline --decorate=full
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	p = pull
+	pushf = push --force-with-lease --force-if-includes
+	rb = rebase
+	s = status -sb
+	ss = status --short
+	sw = switch
+	wt = worktree
+[http]
+	postBuffer = 157286400
+[push]
+	default = current
+[merge]
+	conflictstyle = zdiff3
+[pull]
+	rebase = true
+	autoStash = true
+[grep]
+	lineNumber = true
+[fetch]
+	prune = true
+	pruneTags = true
+[rebase]
+	autosquash = true
+	autoStash = true
+[init]
+	defaultBranch = main
+[pager]
+	branch = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[branch]
+	sort = -committerdate
+	autosetuprebase = always
+[rerere]
+	enabled = true
+
+[include]
+	path = ~/.gitconfig.local
+	path = ~/.gitconfig.work

@@ -1,0 +1,6 @@
+*~
+.DS_Store
+*.sw[po]
+
+**/.claude/settings.local.json
+**/.claude/.cc-writes/
