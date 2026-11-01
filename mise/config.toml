@@ -54,7 +54,6 @@ adopt = true
 "brew-cask:docker-desktop" = "latest"
 "brew-cask:google-chrome" = "latest"
 "brew-cask:google-gemini" = "latest"
-"brew-cask:jetbrains-toolbox" = "latest"
 "brew-cask:keka" = "latest"
 "brew-cask:libreoffice" = "latest"
 "brew-cask:linear" = "latest"
@@ -64,7 +63,6 @@ adopt = true
 "brew-cask:raycast" = "latest"
 "brew-cask:visual-studio-code" = "latest"
 # These run a .pkg installer, which may ask for an admin password
-"brew-cask:google-drive" = "latest"
 "brew-cask:google-japanese-ime" = "latest"
 "brew-cask:tailscale-app" = "latest"
 "brew-cask:zoom" = "latest"

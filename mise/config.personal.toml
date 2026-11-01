@@ -13,6 +13,9 @@ dotnet = ["10"]
 "brew-cask:dockdoor" = "latest"
 "brew-cask:epic-games" = "latest"
 "brew-cask:godot" = "latest"
+# Runs a .pkg installer, which may ask for an admin password
+"brew-cask:google-drive" = "latest"
+"brew-cask:jetbrains-toolbox" = "latest"
 "brew-cask:lm-studio" = "latest"
 "brew-cask:obsidian" = "latest"
 "brew-cask:unity-hub" = "latest"

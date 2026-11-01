@@ -127,12 +127,12 @@ done
 # Apps for every Mac, and apps for the personal one only.
 declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
 for pkg in brew-cask:{claude,chatgpt,raycast,arc,google-chrome,visual-studio-code,docker-desktop} \
-  brew-cask:{jetbrains-toolbox,notion,linear,keka,pearcleaner} \
-  brew-cask:{tailscale-app,zoom,google-drive,google-japanese-ime,ngrok,libreoffice,google-gemini} \
+  brew-cask:{notion,linear,keka,pearcleaner} \
+  brew-cask:{tailscale-app,zoom,google-japanese-ime,ngrok,libreoffice,google-gemini} \
   mas:{937984704,1452453066,1532419400,457622435,1518036000,1342896380}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
 done
-for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games,adobe-creative-cloud} \
+for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games,adobe-creative-cloud,google-drive,jetbrains-toolbox} \
   mas:{975937182,539883307,905953485,904280696,585829637,1278508951,310633997,1380563956}; do
   declared config.personal.toml "$pkg" || fail "mise/config.personal.toml does not declare $pkg"
 done
@@ -147,6 +147,10 @@ grep -q '^dotnet' "$repo/mise/config.toml" && fail "mise/config.toml installs .N
 grep -qF '"brew:dotnet' "$repo"/mise/config*.toml && fail "mise declares .NET as a Homebrew package"
 grep -qF '"brew-cask:dotnet' "$repo"/mise/config*.toml && fail "mise declares .NET as a cask"
 grep -qF '"brew-cask:ngrok"' "$repo/mise/config.personal.toml" && fail "ngrok is declared for the personal Mac only"
+declared config.work.toml brew-cask:slack || fail "mise/config.work.toml does not declare brew-cask:slack"
+for cask in google-drive jetbrains-toolbox; do
+  grep -qF "\"brew-cask:$cask\"" "$repo/mise/config.toml" && fail "$cask is declared for every Mac"
+done
 grep -q 'TODO' "$repo/mise/config.personal.toml" && fail "mise/config.personal.toml still has a TODO"
 # Every App Store id says which app it is.
 grep -E '^"mas:' "$repo"/mise/config*.toml | grep -v '" # ' && fail "an App Store id has no app name"

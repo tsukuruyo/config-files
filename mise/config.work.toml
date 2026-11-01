@@ -2,3 +2,4 @@
 # This repository is public: keep internal tool names out of it.
 
 [bootstrap.packages]
+"brew-cask:slack" = "latest"
