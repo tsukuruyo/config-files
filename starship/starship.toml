@@ -65,11 +65,11 @@ format = '[$symbol$active(\($project\))]($style) '
 [gcloud.project_aliases]
 very-long-project-name = 'vlpn'
 
-#[kubernetes]
-#disabled = false
-#style = 'bold blue'
-#format = '[⛵$context($namespace)]($style) '
-#[[kubernetes.contexts]]
-#context_pattern = "gke_.*_.*_(?P<cluster>[\\w-]+)"
-#context_alias = "$cluster"
+[kubernetes]
+disabled = false
+style = 'bold blue'
+format = '[⛵$context($namespace)]($style) '
+[[kubernetes.contexts]]
+context_pattern = "gke_.*_.*_(?P<cluster>[\\w-]+)"
+context_alias = "$cluster"
 
