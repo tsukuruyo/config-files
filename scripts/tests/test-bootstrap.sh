@@ -120,11 +120,49 @@ mkdir -p "$home/development"
 ln -s "$repo" "$home/development/config-files"
 applied=$(HOME=$home MISE_DATA_DIR=$work/data MISE_CACHE_DIR=$work/cache MISE_STATE_DIR=$work/state \
   "$mise_bin" bootstrap --only dotfiles --yes 2>&1) || fail "mise bootstrap --only dotfiles failed: $applied"
-for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore; do
+for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore \
+  .zshrc:.zshrc .config/sheldon/plugins.toml:sheldon/plugins.toml \
+  .config/starship.toml:starship/starship.toml; do
   target=$home/${pair%%:*} source=$repo/${pair#*:}
   [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$source" ]] ||
     fail "~/${pair%%:*} is not linked to ${pair#*:}"
 done
+
+# .zshrc is shared by every Mac.
+zsh -n "$repo/.zshrc" 2>/dev/null || fail ".zshrc has a zsh syntax error"
+grep -qE '/Users/|nyagasuki|\.zshrc_project|stree' "$repo/.zshrc" &&
+  fail ".zshrc still holds something specific to one Mac"
+for sdk in 'Visual Studio Code' google-cloud-sdk DOTNET_ROOT lmstudio unity/env; do
+  grep -qF "$sdk" "$repo/.zshrc" || fail ".zshrc lost the $sdk setting shared by every Mac"
+done
+grep -qx 'export HOMEBREW_NO_INSTALL_UPGRADE=1' "$repo/.zshrc" ||
+  fail ".zshrc lets brew install upgrade what is already installed"
+
+# A Mac without some tool must still start a shell cleanly.
+unguarded=$(grep -nE '^\s*(\.|source) ' "$repo/.zshrc" || true)
+[[ -z $unguarded ]] || fail ".zshrc reads a file without checking it exists: $unguarded"
+grep -qF 'if [[ -x "${HOME}/.local/bin/mise" ]]; then' "$repo/.zshrc" &&
+  grep -qF 'eval "$("${HOME}/.local/bin/mise" activate zsh)"' "$repo/.zshrc" ||
+  fail ".zshrc does not activate the mise.run install of mise only when it exists"
+# cdr writes ~/.cache/chpwd-recent-dirs without creating ~/.cache.
+grep -qF 'mkdir -p "${HOME}/.cache"' "$repo/.zshrc" || fail ".zshrc does not create ~/.cache for cdr"
+# mise puts go on PATH only once activated, after this section would have run.
+grep -qF 'go env GOPATH' "$repo/.zshrc" && fail ".zshrc still has the Go section mise makes dead"
+
+# Order and safety.
+# ~/bin and ~/.local/bin are writable by anything I run: they must not shadow system tools.
+grep -qE 'PATH="?(\$\{HOME\}|\$HOME|~)/(bin|\.local/bin)' "$repo/.zshrc" &&
+  fail ".zshrc puts a home directory first on PATH"
+# compinit -C skips compaudit; the cache is rebuilt, and audited, once a day.
+grep -qF '(N.mh+24)' "$repo/.zshrc" || fail ".zshrc never rebuilds or audits the completion cache"
+grep -qF 'HISTORY_IGNORE=' "$repo/.zshrc" || fail ".zshrc writes commands with secrets to the history file"
+# Plugins run in every shell: each is pinned, and syntax highlighting loads last (deferred).
+# grep -c exits 1 when it counts 0; the count is still printed.
+plugins=$(grep -c '^\[plugins\.' "$repo/sheldon/plugins.toml" || true)
+pinned=$(grep -cE '^(tag|rev) = ' "$repo/sheldon/plugins.toml" || true)
+[[ $plugins -gt 0 && $plugins == "$pinned" ]] || fail "sheldon pins $pinned of $plugins plugins"
+awk '/^\[plugins\.zsh-syntax-highlighting\]/{p=1;next} /^\[/{p=0} p && /^apply = \["defer"\]/{ok=1} END{exit !ok}' \
+  "$repo/sheldon/plugins.toml" || fail "zsh-syntax-highlighting is not deferred to load last"
 
 # lazygit reads its config from Application Support on macOS (a path with a space).
 target="$home/Library/Application Support/lazygit/config.yml"

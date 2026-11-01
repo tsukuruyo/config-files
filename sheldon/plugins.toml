@@ -1,0 +1,40 @@
+# `sheldon` configuration file
+# ----------------------------
+#
+# You can modify this file directly or you can use one of the following
+# `sheldon` commands which are provided to assist in editing the config file:
+#
+# - `sheldon add` to add a new plugin to the config file
+# - `sheldon edit` to open up the config file in the default editor
+# - `sheldon remove` to remove a plugin from the config file
+#
+# See the documentation for more https://github.com/rossmacarthur/sheldon#readme
+
+shell = "zsh"
+
+# Plugins run inside every shell, so each is pinned to a tag (or a commit when
+# the repository has no tags). Update them by changing the pin on purpose.
+
+[templates]
+# Source the plugin after .zshrc has finished, via zsh-defer
+defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+
+[plugins]
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+rev = "53a26e287fbbe2dcebb3aa1801546c6de32416fa"
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+tag = "0.36.0"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+tag = "v0.7.1"
+
+# Must load after every other widget and compinit, so it is deferred to the end
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
+tag = "0.8.0"
+apply = ["defer"]

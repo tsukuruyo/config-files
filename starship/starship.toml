@@ -1,0 +1,75 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = true
+
+# ref https://github.com/starship/starship/discussions/1107?sort=top#discussioncomment-10214050
+format = """
+$username\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$time\
+| \
+$aws\
+$gcloud\
+$container\
+$kubernetes\
+$line_break\
+$character"""
+
+[directory]
+truncation_length = 3
+truncate_to_repo = false
+fish_style_pwd_dir_length = 1
+truncation_symbol = "…/"
+
+[git_branch]
+disabled = false
+symbol = ''
+format = '[$symbol$branch(:$remote_branch) ]($style)'
+
+[git_status]
+disabled = false
+style = "bold red"
+format = '([$all_status$ahead_behind]($style))'
+conflicted = "="
+ahead = "⇡${count} "
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = "⇣${count} "
+untracked = "?:${count} "
+stashed = "\\$:${count} "
+modified = "!:${count} "
+staged = "+:${count} "
+renamed = "»:${count} "
+deleted = "✘:${count} "
+
+[time]
+disabled = true
+format = '🕙 [$time]($style) '
+time_format = '%m/%d %R'
+
+[aws]
+disabled = false
+symbol = '☁️'
+format = '[$symbol($profile)(\($region\))]($style) '
+
+[gcloud]
+disabled = true
+symbol = '☁️'
+format = '[$symbol$active(\($project\))]($style) '
+[gcloud.project_aliases]
+very-long-project-name = 'vlpn'
+
+#[kubernetes]
+#disabled = false
+#style = 'bold blue'
+#format = '[⛵$context($namespace)]($style) '
+#[[kubernetes.contexts]]
+#context_pattern = "gke_.*_.*_(?P<cluster>[\\w-]+)"
+#context_alias = "$cluster"
+
