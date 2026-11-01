@@ -93,6 +93,7 @@ adopt = true
 # The same 7-day release age as [settings] minimum_release_age, for npm/pnpm and yarn
 "~/.npmrc" = { source = "~/development/config-files/.npmrc" }
 "~/.yarnrc.yml" = { source = "~/development/config-files/.yarnrc.yml" }
+"~/Library/Preferences/pnpm/config.yaml" = { source = "~/development/config-files/pnpm/config.yaml" }
 "~/Library/Application Support/Code/User/settings.json" = { source = "~/development/config-files/vscode/settings.json" }
 "~/Library/Application Support/Code/User/keybindings.json" = { source = "~/development/config-files/vscode/keybindings.json" }
 "~/.claude/CLAUDE.md" = { source = "~/development/config-files/claude/CLAUDE.md" }

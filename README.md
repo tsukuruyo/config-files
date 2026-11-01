@@ -58,7 +58,8 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `starship/starship.toml` | プロンプトの設定。`~/.config/starship.toml` にリンクする |
 | `ghostty/config` | ターミナル（Ghostty）の設定。`~/.config/ghostty/config` にリンクする。使っているフォントはcaskで入れる |
 | `.vimrc` | `~/.vimrc` にリンクする |
-| `.npmrc` | npmとpnpmの設定。`~/.npmrc` にリンクする。`min-release-age` はpnpmが読む。miseの `minimum_release_age` と同じ7日 |
+| `.npmrc` | npmの設定。`~/.npmrc` にリンクする。`min-release-age` でmiseの `minimum_release_age` と同じ7日（日で数える）。pnpm 11以降は `.npmrc` から認証とレジストリの設定しか読まない |
+| `pnpm/config.yaml` | pnpmの全体の設定。macOSでpnpmが読む `~/Library/Preferences/pnpm/config.yaml` にリンクする。`minimumReleaseAge` でmiseと同じ7日（分で数えるので10080） |
 | `.yarnrc.yml` | yarnの設定。`~/.yarnrc.yml` にリンクする。`npmMinimalAgeGate` でmiseと同じ7日 |
 | `vscode/settings.json` / `vscode/keybindings.json` | VS Codeの設定。`~/Library/Application Support/Code/User/` にリンクする。Settings Syncは使わない。エディタのフォントはcaskで入れる |
 | `claude/CLAUDE.md` | Claude Codeのグローバルな指示。`~/.claude/CLAUDE.md` にリンクする。`@~/.codex/AGENTS.md` で共通の指示を読み込み、Claude Codeだけのこと（AskUserQuestionの使い方）を足す |

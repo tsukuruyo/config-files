@@ -1,0 +1,4 @@
+# pnpm's global settings, linked to ~/Library/Preferences/pnpm/config.yaml.
+# pnpm 11+ reads only auth and registry settings from ~/.npmrc, so the release age lives here.
+# The same 7 days as mise's minimum_release_age, in minutes
+minimumReleaseAge: 10080

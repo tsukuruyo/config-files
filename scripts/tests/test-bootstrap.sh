@@ -230,11 +230,22 @@ for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore \
   .config/ghostty/config:ghostty/config .vimrc:.vimrc \
   .claude/CLAUDE.md:claude/CLAUDE.md .claude/statusline.sh:claude/statusline.sh \
   .claude/keybindings.json:claude/keybindings.json \
+  .npmrc:.npmrc .yarnrc.yml:.yarnrc.yml Library/Preferences/pnpm/config.yaml:pnpm/config.yaml \
   .codex/AGENTS.md:codex/AGENTS.md .codex/keybindings.json:codex/keybindings.json; do
   target=$home/${pair%%:*} source=$repo/${pair#*:}
   [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$source" ]] ||
     fail "~/${pair%%:*} is not linked to ${pair#*:}"
 done
+
+# npm, yarn and pnpm wait as long as mise's minimum_release_age before using a new release,
+# each in its own unit: npm in days, yarn as a duration, pnpm in minutes. pnpm 11+ reads only
+# auth and registry settings from .npmrc, so its own config.yaml carries the age.
+days=$(sed -n 's/^minimum_release_age = "\([0-9]*\)d"$/\1/p' "$repo/mise/config.toml")
+[[ -n $days ]] || fail "mise/config.toml has no minimum_release_age in days"
+grep -qx "min-release-age=$days" "$repo/.npmrc" 2>/dev/null || fail ".npmrc does not wait $days days"
+grep -qx "npmMinimalAgeGate: \"${days}d\"" "$repo/.yarnrc.yml" 2>/dev/null || fail ".yarnrc.yml does not wait $days days"
+grep -qx "minimumReleaseAge: $((days * 24 * 60))" "$repo/pnpm/config.yaml" 2>/dev/null || fail "pnpm/config.yaml does not wait $days days"
+grep -qE 'min-release-age` は ?pnpm ?が読む' "$repo/README.md" && fail "README.md says pnpm reads .npmrc's release age"
 
 # .zshrc is shared by every Mac.
 zsh -n "$repo/.zshrc" 2>/dev/null || fail ".zshrc has a zsh syntax error"
