@@ -2,6 +2,8 @@
 
 [bootstrap.packages]
 # Apps
+# Photoshop, Premiere Pro and the other Adobe apps are installed from it
+"brew-cask:adobe-creative-cloud" = "latest"
 "brew-cask:comfy" = "latest"
 "brew-cask:dockdoor" = "latest"
 "brew-cask:epic-games" = "latest"

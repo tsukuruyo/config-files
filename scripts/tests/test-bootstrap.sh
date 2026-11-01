@@ -128,17 +128,19 @@ done
 declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
 for pkg in brew-cask:{claude,chatgpt,raycast,arc,google-chrome,visual-studio-code,docker-desktop} \
   brew-cask:{jetbrains-toolbox,notion,linear,keka,pearcleaner} \
-  brew-cask:{tailscale-app,zoom,google-drive,google-japanese-ime,ngrok,libreoffice} \
+  brew-cask:{tailscale-app,zoom,google-drive,google-japanese-ime,ngrok,libreoffice,google-gemini} \
   mas:{937984704,1452453066,1532419400,457622435,1518036000,1342896380}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
 done
-for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games} \
+for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games,adobe-creative-cloud} \
   mas:{975937182,539883307,905953485,904280696,585829637,1278508951,310633997,1380563956}; do
   declared config.personal.toml "$pkg" || fail "mise/config.personal.toml does not declare $pkg"
 done
 for pkg in brew:{git,git-delta,ripgrep,pam-reattach}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
 done
+# The Canon Utilities here are the inkjet scanner tools, not the camera's EOS Utility.
+grep -qF '"brew-cask:canon-eos-utility"' "$repo"/mise/config*.toml && fail "mise declares Canon's camera utility"
 grep -qF '"brew-cask:ngrok"' "$repo/mise/config.personal.toml" && fail "ngrok is declared for the personal Mac only"
 grep -q 'TODO' "$repo/mise/config.personal.toml" && fail "mise/config.personal.toml still has a TODO"
 # Every App Store id says which app it is.
@@ -179,6 +181,10 @@ done
 # Printed as a table, a float keeps its .0: macOS checks the type, and a single value would print 3.
 macos=$(cfg bootstrap.macos)
 grep -qx '"com.apple.trackpad.scaling" = 3.0' <<<"$macos" || fail "trackpad scaling is not the float 3.0"
+# macOS stores the key repeat rates as floats; an int differs in type and is rewritten every run.
+for rate in 'KeyRepeat = 2.0' 'InitialKeyRepeat = 15.0'; do
+  grep -qx "$rate" <<<"$macos" || fail "key repeat is not the float in '$rate'"
+done
 # Writing accessibility settings needs Full Disk Access, and without it mise bootstrap
 # stops there; README.md has them set by hand, as shibayu36/config-file does.
 grep -q 'universalaccess' <<<"$macos" && fail "mise/config.toml sets accessibility settings, which need Full Disk Access"

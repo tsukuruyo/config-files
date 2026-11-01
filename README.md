@@ -9,7 +9,14 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - `make bootstrap PROFILE=personal` か `make bootstrap PROFILE=work` を実行する。HomebrewとmiseとOrcaが入る。最後に表示されるコマンドを実行して、今のシェルにbrewのPATHを通す
 - App StoreにApple Accountでサインインしておく。`mas:` の項目（Xcodeなど）は `mas` で入れるため、サインインが必要
 - `~/.local/bin/mise bootstrap` を実行する。`brew:mas` が入ると同じ実行の中で `mas:` の項目も入る。最後のfollow-upに `mas: ... skipped (mas not found)` と出るのは実行前の予定がそのまま表示されたもので、途中に `mise mas:` の行が出ていれば問題ない
-- 宣言できないアプリは手で入れる: Adobe Creative Cloud（そこからAdobeのアプリ）、DaVinci Resolve・Blackmagic RAW（公式サイト）、Synergy、Reality Converter（Apple Developer）、Gemini（caskで入るのは別のアプリ）
+- caskもApp Storeもないアプリを手で入れる
+  - DaVinci Resolve: Blackmagic Designのサイト（https://www.blackmagicdesign.com/products/davinciresolve ）から。Blackmagic Proxy Generatorも一緒に入る
+  - Blackmagic RAW: Blackmagic Designのサポートページから
+  - Synergy: Symlessのサイト（https://symless.com/synergy ）から
+  - Reality Converter: Apple Developer（https://developer.apple.com/augmented-reality/tools/ ）から
+  - Canon IJ Scan Utility: Canonのサポートページで、プリンターの機種のドライバーと一緒に
+- 私物Macでは、Adobe Creative Cloud（`brew-cask:adobe-creative-cloud` で入る）にサインインし、そこからAdobeのアプリを入れる
+  - Photoshop・Premiere Pro・Illustrator・After Effects・Audition・Lightroom・Media Encoder・Acrobat
 - sudoをTouch IDで通すため、`/etc/pam.d/sudo_local` を次の2行で作る（`sudo vi /etc/pam.d/sudo_local`）。macOSのアップデートでも消えない。1行目の `pam_reattach.so` は `brew:pam-reattach` で入り、Orcaなどの中のターミナルでもTouch IDを使えるようにする
   ```
   auth       optional       /opt/homebrew/lib/pam/pam_reattach.so ignore_ssh

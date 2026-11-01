@@ -53,6 +53,7 @@ adopt = true
 "brew-cask:claude" = "latest"
 "brew-cask:docker-desktop" = "latest"
 "brew-cask:google-chrome" = "latest"
+"brew-cask:google-gemini" = "latest"
 "brew-cask:jetbrains-toolbox" = "latest"
 "brew-cask:keka" = "latest"
 "brew-cask:linear" = "latest"
@@ -105,8 +106,9 @@ adopt = true
 
 # macOS settings, as this Mac already had them unless noted.
 [bootstrap.macos.defaults.NSGlobalDomain]
-KeyRepeat = 2
-InitialKeyRepeat = 15
+# Floats, as macOS stores them: mise compares types and would rewrite an int every run
+KeyRepeat = 2.0
+InitialKeyRepeat = 15.0
 NSAutomaticCapitalizationEnabled = false
 # Pasted code and commands keep their straight quotes and double hyphens
 NSAutomaticQuoteSubstitutionEnabled = false
