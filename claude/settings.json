@@ -6,11 +6,6 @@
     "CLAUDE_CODE_SCROLL_SPEED": "5"
   },
   "model": "fable[1m]",
-  "skillOverrides": {
-    "find-skills": "off",
-    "grill-me": "off",
-    "stop-slop": "off"
-  },
   "disableSkillShellExecution": true,
   "statusLine": {
     "type": "command",

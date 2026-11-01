@@ -141,6 +141,11 @@ for pkg in brew:{git,git-delta,ripgrep,pam-reattach}; do
 done
 # The Canon Utilities here are the inkjet scanner tools, not the camera's EOS Utility.
 grep -qF '"brew-cask:canon-eos-utility"' "$repo"/mise/config*.toml && fail "mise declares Canon's camera utility"
+# .NET is a language runtime, so it is a mise tool, on the personal Mac only.
+grep -q '^dotnet = ' "$repo/mise/config.personal.toml" || fail "mise/config.personal.toml does not install .NET"
+grep -q '^dotnet' "$repo/mise/config.toml" && fail "mise/config.toml installs .NET on every Mac"
+grep -qF '"brew:dotnet' "$repo"/mise/config*.toml && fail "mise declares .NET as a Homebrew package"
+grep -qF '"brew-cask:dotnet' "$repo"/mise/config*.toml && fail "mise declares .NET as a cask"
 grep -qF '"brew-cask:ngrok"' "$repo/mise/config.personal.toml" && fail "ngrok is declared for the personal Mac only"
 grep -q 'TODO' "$repo/mise/config.personal.toml" && fail "mise/config.personal.toml still has a TODO"
 # Every App Store id says which app it is.
@@ -225,14 +230,28 @@ done
 zsh -n "$repo/.zshrc" 2>/dev/null || fail ".zshrc has a zsh syntax error"
 grep -qE '/Users/|nyagasuki|\.zshrc_project|stree' "$repo/.zshrc" &&
   fail ".zshrc still holds something specific to one Mac"
-for sdk in 'Visual Studio Code' google-cloud-sdk DOTNET_ROOT lmstudio unity/env; do
+for sdk in google-cloud-sdk lmstudio unity/env DOTNET_CLI_TELEMETRY_OPTOUT; do
   grep -qF "$sdk" "$repo/.zshrc" || fail ".zshrc lost the $sdk setting shared by every Mac"
 done
+# The visual-studio-code cask puts code in Homebrew's bin, so the app bundle is not on PATH.
+grep -qF 'Visual Studio Code.app' "$repo/.zshrc" && fail ".zshrc adds VS Code's app bundle to PATH"
+# Tools installed by hand on some Macs only take effect where their directory exists:
+# a DOTNET_ROOT pointing at nothing misleads a .NET installed elsewhere.
+# mise sets DOTNET_ROOT for the .NET it installs, and would adopt one already in the environment.
+grep -v '^[[:space:]]*#' "$repo/.zshrc" | grep -qF 'DOTNET_ROOT' && fail ".zshrc sets DOTNET_ROOT, which mise manages"
+grep -qF 'if [[ -d "${HOME}/.lmstudio/bin" ]]; then' "$repo/.zshrc" ||
+  fail ".zshrc adds LM Studio's bin to PATH without checking it exists"
 grep -qx 'export HOMEBREW_NO_INSTALL_UPGRADE=1' "$repo/.zshrc" ||
   fail ".zshrc lets brew install upgrade what is already installed"
 
 # A Mac without some tool must still start a shell cleanly.
-unguarded=$(grep -nE '^\s*(\.|source) ' "$repo/.zshrc" || true)
+# A sourced file is checked with -f on the line before, or inline as `[[ -f f ]] && . f`.
+unguarded=$(awk '
+  /^[[:space:]]*(\.|source) / {
+    file = $2
+    if (index(prev, "-f") == 0 || index(prev, file) == 0) print NR ": " $0
+  }
+  { prev = $0 }' "$repo/.zshrc")
 [[ -z $unguarded ]] || fail ".zshrc reads a file without checking it exists: $unguarded"
 { grep -qF 'if [[ -x "${HOME}/.local/bin/mise" ]]; then' "$repo/.zshrc" &&
   grep -qF 'eval "$("${HOME}/.local/bin/mise" activate zsh)"' "$repo/.zshrc"; } ||
@@ -466,11 +485,18 @@ chmod +x "$work/skills-bin/pnpx"
 { [[ -x $repo/scripts/install-skills.sh ]] && PATH="$work/skills-bin:$PATH" "$repo/scripts/install-skills.sh" >/dev/null 2>&1; } ||
   fail "scripts/install-skills.sh did not run"
 calls=$(cat "$work/pnpx.log" 2>/dev/null || true)
-for skill in grill-me find-skills stop-slop empirical-prompt-tuning; do
-  grep -qE -- "--skill( [a-z-]+)* $skill( |$)" <<<"$calls" || fail "install-skills.sh does not install $skill"
-done
+grep -qE -- "--skill( [a-z-]+)* empirical-prompt-tuning( |$)" <<<"$calls" ||
+  fail "install-skills.sh does not install empirical-prompt-tuning"
 # Orca installs and updates its own skill.
 grep -q orca-cli <<<"$calls" && fail "install-skills.sh installs orca-cli, which Orca manages"
+# A skill turned off in claude/settings.json is not worth installing on every Mac.
+while IFS= read -r off; do
+  [[ -z $off ]] && continue
+  grep -qE -- "--skill( [a-z-]+)* $off( |$)" <<<"$calls" && fail "install-skills.sh installs $off, which claude/settings.json turns off"
+done < <(jq -r '.skillOverrides // {} | to_entries[] | select(.value == "off") | .key' "$repo/claude/settings.json")
+for skill in grill-me find-skills stop-slop; do
+  grep -qE -- "--skill( [a-z-]+)* $skill( |$)" <<<"$calls" && fail "install-skills.sh still installs $skill"
+done
 # Global, for both agents, without prompts, and every source pinned to a commit.
 while IFS= read -r call; do
   [[ -z $call ]] && continue
@@ -478,6 +504,16 @@ while IFS= read -r call; do
     fail "install-skills.sh call is not pinned, global and for both agents: $call"
 done <<<"$calls"
 [[ -n $calls ]] || fail "install-skills.sh called nothing"
+
+# --- repository rules --------------------------------------------------------
+
+# The global instructions leave the documentation language to each repository.
+grep -q '^## 言語' "$repo/AGENTS.md" || fail "AGENTS.md does not say which language this repository writes in"
+# The global instructions now defer to each repository, so make is no exception to them.
+grep -q '例外' "$repo/AGENTS.md" && fail "AGENTS.md still calls the Makefile an exception to the global instructions"
+# A comment above a group of packages describes every line under it.
+sed -n '/^# These run a .pkg installer/,/^$/p' "$repo/mise/config.toml" | grep -q libreoffice &&
+  fail "libreoffice sits under the .pkg installer comment"
 
 if ((failures > 0)); then
   echo "$failures check(s) failed"

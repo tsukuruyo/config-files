@@ -157,38 +157,38 @@ if (( $+commands[fzf] )); then
 fi
 
 # --------------------------------------------------------------------------------
-# Visual Studio Code
-# --------------------------------------------------------------------------------
-export PATH=${PATH}:"/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-
-# --------------------------------------------------------------------------------
 # Google cloud SDK
 # --------------------------------------------------------------------------------
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then . "${HOME}/google-cloud-sdk/path.zsh.inc"; fi
+if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
+  . "${HOME}/google-cloud-sdk/path.zsh.inc"
+fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f "${HOME}/google-cloud-sdk/completion.zsh.inc" ]; then . "${HOME}/google-cloud-sdk/completion.zsh.inc"; fi
+if [ -f "${HOME}/google-cloud-sdk/completion.zsh.inc" ]; then
+  . "${HOME}/google-cloud-sdk/completion.zsh.inc"
+fi
 
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 # --------------------------------------------------------------------------------
 # .NET
 # --------------------------------------------------------------------------------
-export DOTNET_ROOT=${HOME}/dotnet
-export PATH=$PATH:${DOTNET_ROOT}
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # --------------------------------------------------------------------------------
 # LM Studio CLI (lms)
 # --------------------------------------------------------------------------------
-export PATH="$PATH:${HOME}/.lmstudio/bin"
+if [[ -d "${HOME}/.lmstudio/bin" ]]; then
+  export PATH="$PATH:${HOME}/.lmstudio/bin"
+fi
 
 # --------------------------------------------------------------------------------
 # Unity CLI
 # --------------------------------------------------------------------------------
-# Unity を入れていない Mac でもエラーにしない
-[[ -f "${HOME}/.unity/env" ]] && . "${HOME}/.unity/env"
+if [[ -f "${HOME}/.unity/env" ]]; then
+  . "${HOME}/.unity/env"
+fi
 
 # --------------------------------------------------------------------------------
 # mise

@@ -43,6 +43,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | --- | --- |
 | `Makefile` | このリポジトリのタスク（`bootstrap`・`plan`・`status`・`sync`・`lint`・`skills`）。新しいMacで最初から使えるタスクランナーはmakeだけなので、justfileではなくmakeにする。`brew:just` は、ほかのリポジトリで使うために入れている |
 | `scripts/bootstrap.sh` | Homebrew・mise・Orcaを入れ、`mise/` を `~/.config/mise` にリンクする |
+| `scripts/install-skills.sh` | Claude CodeとCodexのskillsを、skills CLI（`pnpx skills add`）で入れ直す。`make skills` で実行する |
 | `mise/config.toml` | すべてのMacで共通の設定 |
 | `mise/config.personal.toml` | 私物Macだけの設定 |
 | `mise/config.work.toml` | 仕事Macだけの設定。公開リポジトリなので社内ツールの名前などは書かない |
@@ -60,7 +61,6 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `claude/CLAUDE.md` | Claude Codeのグローバルな指示。`~/.claude/CLAUDE.md` にリンクする。`@~/.codex/AGENTS.md` で共通の指示を読み込み、Claude Codeだけのこと（AskUserQuestionの使い方）を足す |
 | `claude/statusline.sh` | Claude Codeのステータスライン。`~/.claude/statusline.sh` にリンクする。jqを使う |
 | `claude/keybindings.json` | Claude Codeのキーの割り当て。`~/.claude/keybindings.json` にリンクする |
-| `scripts/install-skills.sh` | Claude CodeとCodexのskillsを、skills CLI（`pnpx skills add`）で入れ直す。`make skills` で実行する |
 | `claude/settings.json` | Claude Codeの設定のうち、すべてのMacで共通のキーだけ。Claude CodeやOrcaが書き換えるので、`~/.claude/settings.json` はリンクにせず、mise bootstrapがこのキーだけをマージする。権限の `allow` と `ask`（その場で許可したもの）とOrcaのhooksは、Macごとのファイルに残す |
 | `codex/AGENTS.md` | Claude CodeとCodexで共通のグローバルな指示。`~/.codex/AGENTS.md` にリンクする。特定のツールにしかない機能の話は書かない |
 | `codex/keybindings.json` | Codexのキーの割り当て。`~/.codex/keybindings.json` にリンクする |

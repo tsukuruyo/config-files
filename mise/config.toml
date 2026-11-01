@@ -56,6 +56,7 @@ adopt = true
 "brew-cask:google-gemini" = "latest"
 "brew-cask:jetbrains-toolbox" = "latest"
 "brew-cask:keka" = "latest"
+"brew-cask:libreoffice" = "latest"
 "brew-cask:linear" = "latest"
 "brew-cask:ngrok" = "latest"
 "brew-cask:notion" = "latest"
@@ -67,7 +68,6 @@ adopt = true
 "brew-cask:google-japanese-ime" = "latest"
 "brew-cask:tailscale-app" = "latest"
 "brew-cask:zoom" = "latest"
-"brew-cask:libreoffice" = "latest"
 
 # Font used by ghostty/config and vscode/settings.json. Not font-biz-udgothic: that cask clones all
 # of google/fonts (several GB) and fails partway.

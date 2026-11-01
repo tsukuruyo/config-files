@@ -1,5 +1,10 @@
 # Loaded on top of config.toml when miserc.local.toml sets env = ["personal"].
 
+# mise installs .NET with Microsoft's dotnet-install script into one root shared by
+# every SDK version listed, and sets DOTNET_ROOT and PATH for it.
+[tools]
+dotnet = ["10"]
+
 [bootstrap.packages]
 # Apps
 # Photoshop, Premiere Pro and the other Adobe apps are installed from it
