@@ -296,8 +296,20 @@ grep -q '{{' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md has an unfilled 
 # only what is Claude Code's own, so the two never drift apart.
 [[ $(grep -v '^\s*$' "$repo/claude/CLAUDE.md" | head -1) == '@~/.codex/AGENTS.md' ]] ||
   fail "claude/CLAUDE.md does not start by importing ~/.codex/AGENTS.md"
-grep -qx '# 開発スタイル' "$repo/codex/AGENTS.md" || fail "codex/AGENTS.md does not hold the shared instructions"
-grep -qx '# 開発スタイル' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md repeats the shared instructions"
+grep -qx '# 全般' "$repo/codex/AGENTS.md" || fail "codex/AGENTS.md does not hold the shared instructions"
+grep -qx '# 全般' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md repeats the shared instructions"
+# Both tools load the two files together: Anthropic keeps them under 200 lines, and
+# both vendors say capitalised emphasis makes newer models over-apply a rule.
+(($(cat "$repo/codex/AGENTS.md" "$repo/claude/CLAUDE.md" | wc -l) < 200)) || fail "the global instructions are 200 lines or more"
+grep -qE '\b(IMPORTANT|MUST|ALWAYS|NEVER|YOU MUST)\b' "$repo/codex/AGENTS.md" "$repo/claude/CLAUDE.md" &&
+  fail "the global instructions use capitalised emphasis"
+# Global rules come first in the prompt, so they say that the repository's rules and chat win.
+grep -qE 'リポジトリの.*(AGENTS|CLAUDE).*優先' "$repo/codex/AGENTS.md" || fail "codex/AGENTS.md does not yield to repository rules"
+# The rules sources rank highest: verify before saying done, and never game the tests.
+grep -q '実行したコマンドと結果' "$repo/codex/AGENTS.md" || fail "codex/AGENTS.md does not ask for evidence of verification"
+grep -q 'アサーションを弱め' "$repo/codex/AGENTS.md" || fail "codex/AGENTS.md does not forbid weakening tests"
+# The note for people reading claude/CLAUDE.md is an HTML comment, which Claude Code strips.
+grep -q '^共通の指示は' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md loads its maintainer note as an instruction"
 [[ -x $repo/claude/statusline.sh ]] || fail "claude/statusline.sh is not executable"
 grep -qF '"brew:jq"' "$repo/mise/config.toml" || fail "statusline.sh needs jq, which nothing installs"
 
