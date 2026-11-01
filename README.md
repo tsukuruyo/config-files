@@ -93,6 +93,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
   - miseで扱えないHomebrewのパッケージ: `scripts/bootstrap.sh` で `brew install` する。miseはHomebrewのAPIの情報をもとに自分で入れるので、APIに情報がない外部のtapのcask（Rubyの定義を評価するのにRuby 3以上が要る）は扱えない。今はOrcaだけ
 - 新しく足すときは、まず `[bootstrap.packages]` に書いて `mise bootstrap --dry-run` で確かめ、miseで扱えなければ `scripts/bootstrap.sh` に回す。大きすぎて取得に失敗するcask（`font-biz-udgothic` や `font-google-sans-code` など、google/fontsを丸ごと取ってくるもの）は、別のものに替える。`brew info --cask --json=v2 <cask>` の `url` が `https://github.com/google/fonts.git` なら、それにあたる
 - .pkgで入るcask（`google-drive` など）は、インストール中に管理者のパスワードを聞かれることがある
+- kubectlは宣言しない。Docker Desktop（`brew-cask:docker-desktop`）が `/usr/local/bin/kubectl` に自分のものを置くので、それを使う（`.zshrc` の `kc` もこれを呼ぶ）
 - 新しいMacでも必ず入れたいものだけを書く。アドホックに `brew install` したものは書かなくてよい
 - 片方のMacでしか使わないものは、`mise/config.toml` ではなく `mise/config.personal.toml` か `mise/config.work.toml` に書く
 - `mise bootstrap packages status --missing` で、宣言した項目が揃っているか確認できる
