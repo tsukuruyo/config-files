@@ -61,7 +61,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `claude/CLAUDE.md` | Claude Codeのグローバルな指示。`~/.claude/CLAUDE.md` にリンクする。`@~/.codex/AGENTS.md` で共通の指示を読み込み、Claude Codeだけのこと（AskUserQuestionの使い方）を足す |
 | `claude/statusline.sh` | Claude Codeのステータスライン。`~/.claude/statusline.sh` にリンクする。jqを使う |
 | `claude/keybindings.json` | Claude Codeのキーの割り当て。`~/.claude/keybindings.json` にリンクする |
-| `claude/settings.json` | Claude Codeの設定のうち、すべてのMacで共通のキーだけ。Claude CodeやOrcaが書き換えるので、`~/.claude/settings.json` はリンクにせず、mise bootstrapがこのキーだけをマージする。権限の `allow` と `ask`（その場で許可したもの）とOrcaのhooksは、Macごとのファイルに残す |
+| `claude/settings.json` | Claude Codeの設定のうち、すべてのMacで共通のキーだけ。Claude CodeやOrcaが書き換えるので、`~/.claude/settings.json` はリンクにせず、mise bootstrapがこのキーだけをマージする。権限の `allow`（その場で許可したもの）とOrcaのhooksは、Macごとのファイルに残す。`git push` は `ask` に入れ、Claude Codeが実行するたびに確認する |
 | `codex/AGENTS.md` | Claude CodeとCodexで共通のグローバルな指示。`~/.codex/AGENTS.md` にリンクする。特定のツールにしかない機能の話は書かない |
 | `codex/keybindings.json` | Codexのキーの割り当て。`~/.codex/keybindings.json` にリンクする |
 | `codex/config.toml` | Codexの設定のうち `[desktop]` だけ。Codexがnotify・プラグイン・MCPサーバー（アプリの中のパス入り）を書くので、`~/.codex/config.toml` はリンクにせずマージする |
@@ -74,7 +74,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - 指示は短く保つ。Claude Codeは200行を超えると守られにくくなるとしていて、Codexは合計32KiBまでしか読まない。必ず止めたいことは指示ではなく `permissions.deny` やhookに書く
 - Claude Codeの設定は `claude/` に置く。リポジトリ直下の `.claude/` は、このリポジトリ自体のプロジェクト設定として読まれてしまうため使わない
 - `~/.claude/settings.json` の共通のキーを変えたら `claude/settings.json` にも反映する。マージは `claude/settings.json` にあるキーだけを見るので、そこから消したキーは各Macのファイルに残る
-- 配列（`permissions.deny` など）はマージせず、`claude/settings.json` の内容で丸ごと置き換わる
+- 配列（`permissions.deny` や `permissions.ask` など）はマージせず、`claude/settings.json` の内容で丸ごと置き換わる
 - `codex/config.toml` も同じくマージする。Codexの画面で `[desktop]` の設定を変えたら、`codex/config.toml` にも反映する
 - Orcaはアプリ本体だけを、`scripts/bootstrap.sh` がstablyaiのtapのcask（`brew install --cask stablyai/orca/orca`）で入れる。miseの宣言にしないのは、外部のtapのcaskをmiseが読むにはRuby 3以上が要り、新しいMacにはないため（brewは同梱のRubyを使う）。手で入れたOrcaがあれば何もしない。Orcaは自分で更新する。設定はアプリの中（IndexedDBなど）にあり、ファイルとしては管理できない。`~/.orca/agent-hooks/` やClaude Codeのhooksは、Orcaが自分で入れる
 

@@ -23,7 +23,8 @@
     "episodic-memory@superpowers-marketplace": true,
     "superpowers-developing-for-claude-code@superpowers-marketplace": false,
     "security-guidance@claude-plugins-official": true,
-    "ponytail@ponytail": true
+    "ponytail@ponytail": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false
   },
   "extraKnownMarketplaces": {
     "knowledge-work-plugins": {
@@ -55,6 +56,12 @@
         "source": "github",
         "repo": "DietrichGebert/ponytail"
       }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
     }
   },
   "language": "Japanese",
@@ -76,7 +83,6 @@
     "enabled": true,
     "mode": "hold"
   },
-  "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "tui": "fullscreen",
@@ -85,26 +91,26 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "permissions": {
+    "ask": [
+      "Bash(brew install *)",
+      "Bash(gh pr create *)",
+      "Bash(git push *)",
+      "Bash(git rebase *)",
+      "Bash(git reset *)",
+      "Bash(rm *)",
+      "Bash(ssh *)",
+      "Read(~/.claude/**)"
+    ],
     "deny": [
       "Bash(chmod 777 *)",
-      "Bash(curl * | *sh*)",
-      "Bash(curl -d *)",
-      "Bash(curl --data *)",
-      "Bash(curl -X POST *)",
-      "Bash(curl -X PUT *)",
-      "Bash(curl -X DELETE *)",
       "Bash(git branch -D *)",
       "Bash(git clean *)",
-      "Bash(git push *)",
-      "Bash(git reset *)",
       "Bash(git stash drop *)",
       "Bash(kill -9 *)",
       "Bash(pkill *)",
       "Bash(rm -fr:*)",
       "Bash(rm -rf:*)",
       "Bash(sudo *)",
-      "Bash(wget * | *sh*)",
-      "Bash(>*)",
       "Read(~/.aws/**)",
       "Read(~/.azure/**)",
       "Read(~/.config/gh/**)",
@@ -123,7 +129,7 @@
       "Read(**/service-account*.json)",
       "Edit(~/.bashrc)",
       "Edit(~/.zshrc)",
-      "Edit(/etc/**)"
+      "Edit(//etc/**)"
     ],
     "defaultMode": "auto",
     "disableBypassPermissionsMode": "disable"

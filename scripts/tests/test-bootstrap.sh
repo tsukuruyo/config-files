@@ -287,11 +287,34 @@ assert live["permissions"]["allow"] == ["Bash(ls:*)"], "approved rule lost"
 assert live["hooks"]["Stop"][0]["hooks"][0]["command"] == "orca-hook", "Orca hook lost"
 assert live["statusLine"] == shared["statusLine"], "statusLine missing"
 PY
-python3 -I - "$repo/claude/settings.json" <<'PY' || fail "claude/settings.json holds keys that belong to one Mac"
+python3 -I - "$repo/claude/settings.json" <<'PY' || fail "claude/settings.json breaks a rule for what is shared"
 import json, sys
 s = json.load(open(sys.argv[1]))
-# Rules approved on one Mac and hooks installed by Orca stay in that Mac's file.
-assert not {"allow", "ask"} & set(s["permissions"]), "allow/ask are per Mac"
+# Rules approved on the spot (allow) and hooks installed by Orca stay in that Mac's file.
+assert "allow" not in s["permissions"], "allow is per Mac"
+# Pushing waits for a yes each time rather than being impossible: Anthropic's own
+# example puts git push under ask.
+assert "Bash(git push *)" in s["permissions"].get("ask", []), "git push does not ask first"
+assert not any("git push" in r for r in s["permissions"]["deny"]), "git push is denied outright"
+# ask replaces each Mac's list wholesale on merge, so every rule the user asks on lives here.
+for rule in ["Bash(brew install *)", "Bash(gh pr create *)", "Bash(git rebase *)", "Bash(git reset *)",
+             "Bash(rm *)", "Bash(ssh *)", "Read(~/.claude/**)"]:
+    assert rule in s["permissions"]["ask"], f"{rule} does not ask first"
+deny = s["permissions"]["deny"]
+# Bash rules match each subcommand on its own and redirects go to file rules, so a rule
+# with a pipe or starting with > never matches; argument patterns are easy to sidestep.
+assert not [r for r in deny if "|" in r or r.startswith("Bash(>")], "a deny rule can never match"
+assert not [r for r in deny if r.startswith("Bash(curl -")], "a curl argument rule stands in for the sandbox"
+assert not any("git reset" in r for r in deny), "git reset is denied rather than asked"
+# A single leading / is relative to the settings file (~/.claude here); // is the real root.
+import re
+assert not [r for r in deny + s["permissions"]["ask"] if re.match(r"(Read|Edit)\(/[^/]", r)], "a path rule meant to be absolute starts with one /"
+assert "Edit(//etc/**)" in deny, "/etc is not protected from edits"
+# Bypass mode is disabled, so skipping its warning means nothing.
+assert "skipDangerousModePermissionPrompt" not in s, "skipDangerousModePermissionPrompt is set"
+assert s["permissions"].get("disableBypassPermissionsMode") == "disable"
+assert s["enabledPlugins"].get("ui-ux-pro-max@ui-ux-pro-max-skill") is False, "ui-ux-pro-max is not recorded as off"
+assert "ui-ux-pro-max-skill" in s["extraKnownMarketplaces"], "ui-ux-pro-max's marketplace is missing"
 assert "orca" not in json.dumps(s.get("hooks", {})).lower(), "Orca installs its own hooks"
 PY
 python3 -I - "$repo/claude/settings.json" <<'PY' || fail "claude/settings.json lacks \$schema or keeps transcripts only 30 days"
