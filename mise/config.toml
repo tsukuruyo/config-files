@@ -1,0 +1,39 @@
+# Shared by the personal and work Macs.
+# Anything only one Mac needs goes in config.<env>.toml.
+
+[settings]
+minimum_release_age = "7d"
+idiomatic_version_file_enable_tools = ["python", "ruby", "node"]
+
+# Defaults outside projects, which pin their own versions in .node-version etc.
+# Loose enough to get patch releases, tight enough to never jump a minor/major.
+[tools]
+node = "lts"
+python = "3.14"
+ruby = "3.4"
+pnpm = "12"
+
+[bootstrap.brew]
+# Bring apps installed by hand under Homebrew instead of failing on them
+adopt = true
+
+[bootstrap.packages]
+# Basic tools
+"brew:fzf" = "latest"
+"brew:gh" = "latest"
+"brew:ghq" = "latest"
+"brew:git-filter-repo" = "latest"
+"brew:git-lfs" = "latest"
+"brew:gitleaks" = "latest"
+"brew:just" = "latest"
+"brew:lazygit" = "latest"
+"brew:sheldon" = "latest"
+"brew:sops" = "latest"
+"brew:starship" = "latest"
+
+# Apps
+"brew-cask:ghostty" = "latest"
+
+# App Store
+"brew:mas" = "latest"
+"mas:497799835" = "latest" # Xcode

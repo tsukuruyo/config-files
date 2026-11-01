@@ -1,0 +1,11 @@
+# Loaded on top of config.toml when miserc.local.toml sets env = ["personal"].
+
+[bootstrap.packages]
+# Apps
+"brew-cask:dockdoor" = "latest"
+"brew-cask:ngrok" = "latest"
+
+# App Store
+# TODO: add the other App Store apps by id (run `mas list`):
+# Amphetamine, Dictionaries, Fantastical, Hex Fiend, Hidden Bar, LINE,
+# MeetingBar, NordVPN, Sequel Ace, Things3, Todoist, Trello, WhatsApp, Yoink

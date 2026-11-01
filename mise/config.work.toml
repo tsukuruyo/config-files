@@ -1,0 +1,4 @@
+# Loaded on top of config.toml when miserc.local.toml sets env = ["work"].
+# This repository is public: keep internal tool names out of it.
+
+[bootstrap.packages]
