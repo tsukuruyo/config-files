@@ -127,11 +127,13 @@ done
 # Apps for every Mac, and apps for the personal one only.
 declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
 for pkg in brew-cask:{claude,chatgpt,raycast,arc,google-chrome,visual-studio-code,docker-desktop} \
-  brew-cask:{notion,linear,keka,pearcleaner} \
+  brew-cask:{notion,linear,keka,pearcleaner,sequel-ace} \
   brew-cask:{tailscale-app,zoom,google-japanese-ime,ngrok,libreoffice,google-gemini} \
-  mas:{937984704,1452453066,1532419400,457622435,1518036000,1342896380}; do
+  mas:{937984704,1452453066,1532419400,457622435,1342896380}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
 done
+# Sequel Ace comes from its cask, not also from the App Store.
+grep -qF '"mas:1518036000"' "$repo"/mise/config*.toml && fail "Sequel Ace is declared from the App Store as well as its cask"
 for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games,adobe-creative-cloud,google-drive,jetbrains-toolbox} \
   mas:{975937182,539883307,905953485,904280696,585829637,1278508951,310633997,1380563956}; do
   declared config.personal.toml "$pkg" || fail "mise/config.personal.toml does not declare $pkg"
@@ -170,8 +172,8 @@ cfg() {
     "$mise_bin" config get -f "$repo/mise/config.toml" "$1" 2>/dev/null || true
 }
 for pair in \
-  bootstrap.macos.defaults.NSGlobalDomain.KeyRepeat=2 \
-  bootstrap.macos.defaults.NSGlobalDomain.InitialKeyRepeat=15 \
+  bootstrap.macos.keyboard.key_repeat=2 \
+  bootstrap.macos.keyboard.initial_key_repeat=15 \
   bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled=false \
   bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled=false \
   bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled=false \
@@ -186,16 +188,18 @@ for pair in \
 done
 # Left at macOS's defaults on purpose: period substitution, spelling correction, fn keys,
 # natural scrolling, swipe navigation, screenshots and the Ctrl+Space input source shortcut.
-[[ $(cfg bootstrap.macos.defaults.NSGlobalDomain | grep -c ' = ' || true) == 6 ]] ||
-  fail "NSGlobalDomain sets keys other than the six chosen"
+[[ $(cfg bootstrap.macos.defaults.NSGlobalDomain | grep -c ' = ' || true) == 4 ]] ||
+  fail "NSGlobalDomain sets keys other than the four chosen"
 [[ -z $(cfg 'bootstrap.macos.defaults."com.apple.screencapture"') ]] || fail "screenshot settings were not chosen"
 # Printed as a table, a float keeps its .0: macOS checks the type, and a single value would print 3.
 macos=$(cfg bootstrap.macos)
 grep -qx '"com.apple.trackpad.scaling" = 3.0' <<<"$macos" || fail "trackpad scaling is not the float 3.0"
-# macOS stores the key repeat rates as floats; an int differs in type and is rewritten every run.
-for rate in 'KeyRepeat = 2.0' 'InitialKeyRepeat = 15.0'; do
-  grep -qx "$rate" <<<"$macos" || fail "key repeat is not the float in '$rate'"
+# System Settings stores the key repeat rates as integers, which [bootstrap.macos.keyboard]
+# writes: a float in [bootstrap.macos.defaults] differs in type and was asked about every run.
+for rate in 'key_repeat = 2' 'initial_key_repeat = 15'; do
+  grep -qx "$rate" <<<"$macos" || fail "key repeat is not the integer in '$rate'"
 done
+grep -q 'KeyRepeat' <<<"$macos" && fail "key repeat is set in [bootstrap.macos.defaults] instead of [bootstrap.macos.keyboard]"
 # Writing accessibility settings needs Full Disk Access, and without it mise bootstrap
 # stops there; README.md has them set by hand, as shibayu36/config-file does.
 grep -q 'universalaccess' <<<"$macos" && fail "mise/config.toml sets accessibility settings, which need Full Disk Access"
