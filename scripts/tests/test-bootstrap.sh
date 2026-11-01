@@ -172,8 +172,8 @@ cfg() {
     "$mise_bin" config get -f "$repo/mise/config.toml" "$1" 2>/dev/null || true
 }
 for pair in \
-  bootstrap.macos.defaults.NSGlobalDomain.KeyRepeat=2 \
-  bootstrap.macos.defaults.NSGlobalDomain.InitialKeyRepeat=15 \
+  bootstrap.macos.keyboard.key_repeat=2 \
+  bootstrap.macos.keyboard.initial_key_repeat=15 \
   bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled=false \
   bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled=false \
   bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled=false \
@@ -188,16 +188,18 @@ for pair in \
 done
 # Left at macOS's defaults on purpose: period substitution, spelling correction, fn keys,
 # natural scrolling, swipe navigation, screenshots and the Ctrl+Space input source shortcut.
-[[ $(cfg bootstrap.macos.defaults.NSGlobalDomain | grep -c ' = ' || true) == 6 ]] ||
-  fail "NSGlobalDomain sets keys other than the six chosen"
+[[ $(cfg bootstrap.macos.defaults.NSGlobalDomain | grep -c ' = ' || true) == 4 ]] ||
+  fail "NSGlobalDomain sets keys other than the four chosen"
 [[ -z $(cfg 'bootstrap.macos.defaults."com.apple.screencapture"') ]] || fail "screenshot settings were not chosen"
 # Printed as a table, a float keeps its .0: macOS checks the type, and a single value would print 3.
 macos=$(cfg bootstrap.macos)
 grep -qx '"com.apple.trackpad.scaling" = 3.0' <<<"$macos" || fail "trackpad scaling is not the float 3.0"
-# macOS stores the key repeat rates as floats; an int differs in type and is rewritten every run.
-for rate in 'KeyRepeat = 2.0' 'InitialKeyRepeat = 15.0'; do
-  grep -qx "$rate" <<<"$macos" || fail "key repeat is not the float in '$rate'"
+# System Settings stores the key repeat rates as integers, which [bootstrap.macos.keyboard]
+# writes: a float in [bootstrap.macos.defaults] differs in type and was asked about every run.
+for rate in 'key_repeat = 2' 'initial_key_repeat = 15'; do
+  grep -qx "$rate" <<<"$macos" || fail "key repeat is not the integer in '$rate'"
 done
+grep -q 'KeyRepeat' <<<"$macos" && fail "key repeat is set in [bootstrap.macos.defaults] instead of [bootstrap.macos.keyboard]"
 # Writing accessibility settings needs Full Disk Access, and without it mise bootstrap
 # stops there; README.md has them set by hand, as shibayu36/config-file does.
 grep -q 'universalaccess' <<<"$macos" && fail "mise/config.toml sets accessibility settings, which need Full Disk Access"
