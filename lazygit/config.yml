@@ -1,5 +1,5 @@
 gui:
-  wrapLinesInStagingView: true
+  wrapLinesInDiffView: true
 git:
   # A background fetch would ask Bitwarden to approve the SSH key every minute
   autoFetch: false
