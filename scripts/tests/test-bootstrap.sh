@@ -124,6 +124,68 @@ for env in personal work; do
   grep -q "config.$env.toml" <<<"$loaded" || fail "env $env does not load config.$env.toml"
   grep -q "config.$other.toml" <<<"$loaded" && fail "env $env also loads config.$other.toml"
 done
+# Apps for every Mac, and apps for the personal one only.
+declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
+for pkg in brew-cask:{claude,chatgpt,raycast,arc,google-chrome,visual-studio-code,docker-desktop} \
+  brew-cask:{jetbrains-toolbox,notion,linear,keka,pearcleaner} \
+  brew-cask:{tailscale-app,zoom,google-drive,google-japanese-ime,ngrok,libreoffice} \
+  mas:{937984704,1452453066,1532419400,457622435,1518036000,1342896380}; do
+  declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
+done
+for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games} \
+  mas:{975937182,539883307,905953485,904280696,585829637,1278508951,310633997,1380563956}; do
+  declared config.personal.toml "$pkg" || fail "mise/config.personal.toml does not declare $pkg"
+done
+for pkg in brew:{git,git-delta,ripgrep,pam-reattach}; do
+  declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
+done
+grep -qF '"brew-cask:ngrok"' "$repo/mise/config.personal.toml" && fail "ngrok is declared for the personal Mac only"
+grep -q 'TODO' "$repo/mise/config.personal.toml" && fail "mise/config.personal.toml still has a TODO"
+# Every App Store id says which app it is.
+grep -E '^"mas:' "$repo"/mise/config*.toml | grep -v '" # ' && fail "an App Store id has no app name"
+# The dotfile merges need a recent mise; an older one must stop instead of linking settings.json.
+min=$(sed -n 's/^min_version = "\(.*\)"$/\1/p' "$repo/mise/config.toml")
+have=$("$mise_bin" --version 2>/dev/null | awk '{print $1}')
+[[ -n $min ]] || fail "mise/config.toml sets no min_version"
+[[ -z $min || $(printf '%s\n%s\n' "$min" "$have" | sort -V | head -1) == "$min" ]] ||
+  fail "min_version $min is newer than the mise under test ($have)"
+
+# macOS settings, read from the file rather than applied: defaults write to the real
+# user's preferences whatever HOME is.
+cfg() {
+  MISE_DATA_DIR=$work/data MISE_CACHE_DIR=$work/cache MISE_STATE_DIR=$work/state \
+    "$mise_bin" config get -f "$repo/mise/config.toml" "$1" 2>/dev/null || true
+}
+for pair in \
+  bootstrap.macos.defaults.NSGlobalDomain.KeyRepeat=2 \
+  bootstrap.macos.defaults.NSGlobalDomain.InitialKeyRepeat=15 \
+  bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled=false \
+  bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled=false \
+  bootstrap.macos.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled=false \
+  'bootstrap.macos.defaults."com.apple.AppleMultitouchTrackpad".Clicking=true' \
+  'bootstrap.macos.defaults."com.apple.driver.AppleBluetoothMultitouch.trackpad".Clicking=true' \
+  'bootstrap.macos.defaults."com.apple.dock".autohide=true' \
+  'bootstrap.macos.defaults."com.apple.finder".AppleShowAllFiles=true' \
+  'bootstrap.macos.defaults."com.apple.finder".FXPreferredViewStyle=Nlsv'; do
+  key=${pair%=*} want=${pair##*=}
+  got=$(cfg "$key")
+  [[ $got == "$want" || $got == "\"$want\"" ]] || fail "mise/config.toml $key is '$got', want '$want'"
+done
+# Left at macOS's defaults on purpose: period substitution, spelling correction, fn keys,
+# natural scrolling, swipe navigation, screenshots and the Ctrl+Space input source shortcut.
+[[ $(cfg bootstrap.macos.defaults.NSGlobalDomain | grep -c ' = ' || true) == 6 ]] ||
+  fail "NSGlobalDomain sets keys other than the six chosen"
+[[ -z $(cfg 'bootstrap.macos.defaults."com.apple.screencapture"') ]] || fail "screenshot settings were not chosen"
+# Printed as a table, a float keeps its .0: macOS checks the type, and a single value would print 3.
+macos=$(cfg bootstrap.macos)
+grep -qx '"com.apple.trackpad.scaling" = 3.0' <<<"$macos" || fail "trackpad scaling is not the float 3.0"
+grep -A1 -x '\[defaults."com.apple.universalaccess"\]' <<<"$macos" | grep -qx 'mouseDriverCursorSize = 3.0' ||
+  fail "the mouse cursor is not enlarged to the float 3.0"
+# Tap to click for the login window too lives in the current host's NSGlobalDomain.
+entries=$(sed -n '/^\[\[defaults_entries\]\]/,$p' <<<"$macos")
+{ grep -q 'com.apple.mouse.tapBehavior' <<<"$entries" && grep -q 'host = "current"' <<<"$entries"; } ||
+  fail "tap to click is not set for the current host"
+grep -q 'symbolichotkeys' <<<"$entries" && fail "keyboard shortcuts were not chosen"
 
 # --- dotfiles ---------------------------------------------------------------
 
@@ -145,6 +207,7 @@ for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore \
   .config/starship.toml:starship/starship.toml \
   .config/ghostty/config:ghostty/config .vimrc:.vimrc \
   .claude/CLAUDE.md:claude/CLAUDE.md .claude/statusline.sh:claude/statusline.sh \
+  .claude/keybindings.json:claude/keybindings.json \
   .codex/AGENTS.md:codex/AGENTS.md .codex/keybindings.json:codex/keybindings.json; do
   target=$home/${pair%%:*} source=$repo/${pair#*:}
   [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$source" ]] ||
@@ -262,6 +325,21 @@ target="$home/Library/Application Support/lazygit/config.yml"
 # A background fetch would ask Bitwarden to approve the SSH key every minute.
 grep -qx '  autoFetch: false' "$repo/lazygit/config.yml" 2>/dev/null ||
   fail "lazygit/config.yml does not turn off git.autoFetch"
+# lazygit shows diffs through delta too, without delta's own pager.
+grep -qx '    - command: delta --paging=never' "$repo/lazygit/config.yml" 2>/dev/null ||
+  fail "lazygit/config.yml does not render diffs with delta"
+
+# VS Code keeps its settings in Application Support, and Settings Sync is off.
+for f in settings.json keybindings.json; do
+  target="$home/Library/Application Support/Code/User/$f"
+  [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$repo/vscode/$f" ]] ||
+    fail "VS Code's $f is not linked to vscode/$f"
+done
+# Like Ghostty's, the editor font comes from a cask.
+vscode_font=$(sed -n "s/.*\"editor.fontFamily\": \"'\([^']*\)'.*/\1/p" "$repo/vscode/settings.json")
+[[ -n $vscode_font ]] || fail "vscode/settings.json names no editor font"
+grep -qF "\"brew-cask:font-$(tr '[:upper:] ' '[:lower:]-' <<<"$vscode_font")\"" "$repo/mise/config.toml" ||
+  fail "VS Code font $vscode_font has no cask in mise/config.toml"
 
 # git as it would run in that HOME, with no outside config leaking in.
 home_git() {
@@ -301,6 +379,11 @@ for pair in \
   got=$(home_git -C "$work" config "$key" || true)
   [[ $got == "$want" ]] || fail "git config $key is '$got', want '$want'"
 done
+# Diffs, logs and git add -p go through delta.
+[[ $(home_git -C "$work" config core.pager || true) == delta ]] || fail "git does not page through delta"
+[[ $(home_git -C "$work" config interactive.diffFilter || true) == 'delta --color-only' ]] ||
+  fail "git add -p does not show delta's diff"
+[[ $(home_git -C "$work" config delta.navigate || true) == true ]] || fail "delta cannot jump between files with n/N"
 [[ -z $(home_git -C "$work" config merge.ff || true) ]] || fail "merge.ff is set; it was left at git's default"
 # Only gh answers for github.com: the empty helper drops osxkeychain there.
 helpers=$(home_git -C "$work" config --get-all credential.https://github.com.helper || true)
@@ -335,20 +418,43 @@ done
 # This repository's tasks are make's: make is on a new Mac from the start, while just
 # (installed for other repositories) only arrives with mise bootstrap.
 [[ ! -e $repo/justfile ]] || fail "justfile exists; this repository's tasks belong in the Makefile"
-[[ $(sed -n 's/^\([a-z][a-z-]*\):.*/\1/p' "$repo/Makefile" | sort | tr '\n' ' ') == "bootstrap lint plan status sync " ]] ||
-  fail "Makefile does not have exactly bootstrap, lint, plan, status and sync"
-grep -qx '\.PHONY: bootstrap lint plan status sync' "$repo/Makefile" || fail "Makefile targets are not all .PHONY"
+[[ $(sed -n 's/^\([a-z][a-z-]*\):.*/\1/p' "$repo/Makefile" | sort | tr '\n' ' ') == "bootstrap lint plan skills status sync " ]] ||
+  fail "Makefile does not have exactly bootstrap, lint, plan, skills, status and sync"
+grep -qx '\.PHONY: bootstrap lint plan skills status sync' "$repo/Makefile" || fail "Makefile targets are not all .PHONY"
 grep -qF '"brew:shellcheck"' "$repo/mise/config.toml" || fail "make lint needs shellcheck, which nothing installs"
 # What each target would run, without running it.
 dry() { make -s -C "$repo" -n "$1" 2>/dev/null || true; }
 [[ $(dry plan) == 'mise bootstrap --dry-run' ]] || fail "make plan does not dry-run mise bootstrap"
 [[ $(dry status) == 'mise bootstrap status' ]] || fail "make status does not show mise bootstrap status"
 [[ $(dry sync) == $'git pull\nmise bootstrap' ]] || fail "make sync does not pull and then bootstrap"
+[[ $(dry skills) == scripts/install-skills.sh ]] || fail "make skills does not run scripts/install-skills.sh"
 lint=$(dry lint)
-for script in scripts/bootstrap.sh scripts/tests/test-bootstrap.sh claude/statusline.sh; do
+for script in scripts/bootstrap.sh scripts/install-skills.sh scripts/tests/test-bootstrap.sh claude/statusline.sh; do
   grep -q "^shellcheck .*$script" <<<"$lint" || fail "make lint does not shellcheck $script"
 done
 grep -q '^gitleaks ' <<<"$lint" || fail "make lint does not look for secrets"
+
+# --- skills -----------------------------------------------------------------
+
+# install-skills.sh runs the skills CLI through pnpx; a stub logs what it was asked.
+mkdir -p "$work/skills-bin"
+printf '#!/bin/sh\necho "$*" >>"%s"\n' "$work/pnpx.log" >"$work/skills-bin/pnpx"
+chmod +x "$work/skills-bin/pnpx"
+{ [[ -x $repo/scripts/install-skills.sh ]] && PATH="$work/skills-bin:$PATH" "$repo/scripts/install-skills.sh" >/dev/null 2>&1; } ||
+  fail "scripts/install-skills.sh did not run"
+calls=$(cat "$work/pnpx.log" 2>/dev/null || true)
+for skill in grill-me find-skills stop-slop empirical-prompt-tuning; do
+  grep -qE -- "--skill( [a-z-]+)* $skill( |$)" <<<"$calls" || fail "install-skills.sh does not install $skill"
+done
+# Orca installs and updates its own skill.
+grep -q orca-cli <<<"$calls" && fail "install-skills.sh installs orca-cli, which Orca manages"
+# Global, for both agents, without prompts, and every source pinned to a commit.
+while IFS= read -r call; do
+  [[ -z $call ]] && continue
+  [[ $call =~ ^skills\ add\ [A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9a-f]{40}\ -g\ -a\ claude-code\ codex\ -y\ --skill\  ]] ||
+    fail "install-skills.sh call is not pinned, global and for both agents: $call"
+done <<<"$calls"
+[[ -n $calls ]] || fail "install-skills.sh called nothing"
 
 if ((failures > 0)); then
   echo "$failures check(s) failed"

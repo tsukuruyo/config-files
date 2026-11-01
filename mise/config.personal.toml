@@ -2,10 +2,20 @@
 
 [bootstrap.packages]
 # Apps
+"brew-cask:comfy" = "latest"
 "brew-cask:dockdoor" = "latest"
-"brew-cask:ngrok" = "latest"
+"brew-cask:epic-games" = "latest"
+"brew-cask:godot" = "latest"
+"brew-cask:lm-studio" = "latest"
+"brew-cask:obsidian" = "latest"
+"brew-cask:unity-hub" = "latest"
 
 # App Store
-# TODO: add the other App Store apps by id (run `mas list`):
-# Amphetamine, Dictionaries, Fantastical, Hex Fiend, Hidden Bar, LINE,
-# MeetingBar, NordVPN, Sequel Ace, Things3, Todoist, Trello, WhatsApp, Yoink
+"mas:1380563956" = "latest" # Dictionaries
+"mas:975937182" = "latest" # Fantastical
+"mas:539883307" = "latest" # LINE
+"mas:905953485" = "latest" # NordVPN
+"mas:904280696" = "latest" # Things 3
+"mas:585829637" = "latest" # Todoist
+"mas:1278508951" = "latest" # Trello
+"mas:310633997" = "latest" # WhatsApp

@@ -1,7 +1,7 @@
 # make is the one task runner a new Mac has (from the Xcode Command Line Tools),
 # so this repository keeps its tasks here rather than in a justfile.
 
-.PHONY: bootstrap lint plan status sync
+.PHONY: bootstrap lint plan skills status sync
 
 # Install Homebrew, mise and Orca and link mise/ (usage: make bootstrap PROFILE=personal|work)
 bootstrap:
@@ -20,7 +20,11 @@ sync:
 	git pull
 	mise bootstrap
 
+# Install the agent skills for Claude Code and Codex
+skills:
+	scripts/install-skills.sh
+
 # Check the shell scripts and look for secrets in the working tree
 lint:
-	shellcheck scripts/bootstrap.sh scripts/tests/test-bootstrap.sh claude/statusline.sh
+	shellcheck scripts/bootstrap.sh scripts/install-skills.sh scripts/tests/test-bootstrap.sh claude/statusline.sh
 	gitleaks dir --no-banner .

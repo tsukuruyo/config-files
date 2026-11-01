@@ -1,0 +1,11 @@
+{
+    "editor.accessibilitySupport": "off",
+    "editor.fontFamily": "'Google Sans Code', Menlo, Monaco, 'Courier New', monospace",
+    "github.copilot.editor.enableAutoCompletions": true,
+    "javascript.updateImportsOnFileMove.enabled": "never",
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "claudeCode.preferredLocation": "panel",
+    "claudeCode.useTerminal": true,
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
+    "update.showReleaseNotes": false
+}

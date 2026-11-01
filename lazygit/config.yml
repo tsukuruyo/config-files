@@ -3,6 +3,8 @@ gui:
 git:
   # A background fetch would ask Bitwarden to approve the SSH key every minute
   autoFetch: false
+  diffRenderers:
+    - command: delta --paging=never
 keybinding:
   universal:
     return: [<esc>, <ctrl+g>]

@@ -1,6 +1,15 @@
 [core]
 	autocrlf = false
 	quotepath = false
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	# n and N jump between files
+	navigate = true
+	line-numbers = true
+	# Split Japanese into words by script, so a changed word is highlighted, not the whole line
+	word-diff-regex = "[a-zA-Z0-9_]+|\\p{Hiragana}+|\\p{Katakana}+|\\p{Han}+|[^\\s]"
 [column]
 	ui = auto
 [color]
