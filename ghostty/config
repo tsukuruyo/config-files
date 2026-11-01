@@ -1,0 +1,54 @@
+# Ghostty config
+# https://ghostty.org/docs/config
+
+# テーマ
+theme = Nord Wave
+
+# フォント
+# JetBrains Mono と BIZ UDゴシックを合成し、Nerd Fonts のアイコンを足したもの
+font-family = UDEV Gothic NF
+font-size = 15
+font-thicken = true
+font-feature = -dlig
+
+
+scrollback-limit = 100000
+
+# 背景透過
+background-opacity = 0.85
+background-blur-radius = 20
+
+# 非アクティブペインを暗く
+unfocused-split-opacity = 0.7
+
+# カーソル
+cursor-opacity = 0.8
+cursor-color = ffffff
+
+# ウィンドウ
+window-padding-x = 4
+window-padding-y = 4
+window-padding-balance = true
+window-save-state = always
+
+# 通知
+desktop-notifications = true
+
+# macOS 設定
+macos-titlebar-style = tabs
+macos-option-as-alt = true
+macos-hidden = always
+
+
+## quick-terminal
+# global keybinds require Accessibility permission for Ghostty
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+# スタイル設定
+quick-terminal-position = right
+quick-terminal-animation-duration = 0.2
+quick-terminal-screen = main
+quick-terminal-size = 60%
+
+## この辺は見た目なのでお好みで
+cursor-style = bar
+#macos-titlebar-style = hidden

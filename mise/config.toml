@@ -36,6 +36,10 @@ adopt = true
 "brew-cask:bitwarden" = "latest"
 "brew-cask:ghostty" = "latest"
 
+# Font used by ghostty/config. Not font-biz-udgothic: that cask clones all
+# of google/fonts (several GB) and fails partway.
+"brew-cask:font-udev-gothic-nf" = "latest"
+
 # App Store
 "brew:mas" = "latest"
 "mas:497799835" = "latest" # Xcode
@@ -47,3 +51,5 @@ adopt = true
 "~/.zshrc" = { source = "~/development/config-files/.zshrc" }
 "~/.config/sheldon/plugins.toml" = { source = "~/development/config-files/sheldon/plugins.toml" }
 "~/.config/starship.toml" = { source = "~/development/config-files/starship/starship.toml" }
+"~/.config/ghostty/config" = { source = "~/development/config-files/ghostty/config" }
+"~/.vimrc" = { source = "~/development/config-files/.vimrc" }

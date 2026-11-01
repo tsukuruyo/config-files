@@ -122,7 +122,8 @@ applied=$(HOME=$home MISE_DATA_DIR=$work/data MISE_CACHE_DIR=$work/cache MISE_ST
   "$mise_bin" bootstrap --only dotfiles --yes 2>&1) || fail "mise bootstrap --only dotfiles failed: $applied"
 for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore \
   .zshrc:.zshrc .config/sheldon/plugins.toml:sheldon/plugins.toml \
-  .config/starship.toml:starship/starship.toml; do
+  .config/starship.toml:starship/starship.toml \
+  .config/ghostty/config:ghostty/config .vimrc:.vimrc; do
   target=$home/${pair%%:*} source=$repo/${pair#*:}
   [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$source" ]] ||
     fail "~/${pair%%:*} is not linked to ${pair#*:}"
@@ -163,6 +164,15 @@ pinned=$(grep -cE '^(tag|rev) = ' "$repo/sheldon/plugins.toml" || true)
 [[ $plugins -gt 0 && $plugins == "$pinned" ]] || fail "sheldon pins $pinned of $plugins plugins"
 awk '/^\[plugins\.zsh-syntax-highlighting\]/{p=1;next} /^\[/{p=0} p && /^apply = \["defer"\]/{ok=1} END{exit !ok}' \
   "$repo/sheldon/plugins.toml" || fail "zsh-syntax-highlighting is not deferred to load last"
+
+# Ghostty: one theme (a later one silently wins), and every font is installed by a cask.
+[[ $(grep -c '^theme = ' "$repo/ghostty/config" 2>/dev/null || true) == 1 ]] ||
+  fail "ghostty/config does not set exactly one theme"
+while IFS= read -r font; do
+  cask=font-$(tr '[:upper:] ' '[:lower:]-' <<<"$font")
+  grep -qF "\"brew-cask:$cask\"" "$repo/mise/config.toml" || fail "ghostty font $font has no $cask in mise/config.toml"
+done < <(sed -n 's/^font-family = //p' "$repo/ghostty/config" 2>/dev/null)
+[[ -n $(sed -n 's/^font-family = //p' "$repo/ghostty/config" 2>/dev/null) ]] || fail "ghostty/config names no font"
 
 # lazygit reads its config from Application Support on macOS (a path with a space).
 target="$home/Library/Application Support/lazygit/config.yml"

@@ -10,6 +10,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - App StoreにApple Accountでサインインしておく。`mas:` の項目（Xcodeなど）は `mas` で入れるため、サインインが必要
 - `~/.local/bin/mise bootstrap` を実行する。`brew:mas` が入ると同じ実行の中で `mas:` の項目も入る。最後のfollow-upに `mas: ... skipped (mas not found)` と出るのは実行前の予定がそのまま表示されたもので、途中に `mise mas:` の行が出ていれば問題ない
 - 新しいターミナルを開く。~/.zshrcがこのリポジトリの.zshrcになり、初回はsheldonがGitHubからプラグインを取ってくるので少し時間がかかる（ネットワークが必要）
+- Ghosttyを起動し、システム設定 → プライバシーとセキュリティ → アクセシビリティでGhosttyを許可する。quick terminalのグローバルなショートカット（Ctrl+`）に必要なため
 - ~/.gitconfig.localに `[user]` の `name` と `email` を書く。公開リポジトリなので.gitconfigには書かず、.gitconfigの最後でincludeする。仕事用Macだけの設定は~/.gitconfig.workに書く
 - BitwardenにログインしてSSH agentを有効化し、~/.ssh/configの先頭に `Include ~/development/config-files/ssh/config` を書く
 - originをSSHに切り替える（`git remote set-url origin git@github.com:tsukuruyo/config-files.git`）
@@ -35,6 +36,8 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `.zshrc` | `~/.zshrc` にリンクする。すべてのMacで共通。miseのactivateもここで行うので、`mise` はシェルからそのまま使える |
 | `sheldon/plugins.toml` | zshのプラグイン。`~/.config/sheldon/plugins.toml` にリンクする。シェルの中で動くので、それぞれをタグかコミットに固定し、更新するときは固定を書き換える |
 | `starship/starship.toml` | プロンプトの設定。`~/.config/starship.toml` にリンクする |
+| `ghostty/config` | ターミナル（Ghostty）の設定。`~/.config/ghostty/config` にリンクする。使っているフォントはcaskで入れる |
+| `.vimrc` | `~/.vimrc` にリンクする |
 
 ## パッケージ
 
