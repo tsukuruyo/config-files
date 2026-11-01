@@ -29,6 +29,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - Orcaを起動し、ホームディレクトリへのアクセスを許可する。初回は`~/.claude`・`~/.codex`・Ghosttyの設定を取り込むかを聞かれる。Orcaは自分でClaude Codeのhooksを`~/.claude/settings.json`に書き足し、以降は自動で更新する
 - `~/.gitconfig.local`に `[user]` の `name` と `email` を書く。公開リポジトリなので.gitconfigには書かず、.gitconfigの最後でincludeする。仕事用Macだけの設定は`~/.gitconfig.work`に書く
 - BitwardenにログインしてSSH agentを有効化し、`~/.ssh/config`の先頭に `Include ~/development/config-files/ssh/config` を書く
+  - Bitwardenの設定の「SSHエージェントを使用する際に認証を要求する」を「Remember until vault is locked」にする。既定の「Always」は鍵を使うたびに承認の画面を出す。こちらは、同じ鍵と接続先なら、保管庫がロックされるまで1回の承認で済む
 - originをSSHに切り替える（`git remote set-url origin git@github.com:tsukuruyo/config-files.git`）
 
 ## 日々の同期

@@ -127,8 +127,6 @@
       "Read(**/credentials.json)",
       "Read(**/secrets/**)",
       "Read(**/service-account*.json)",
-      "Edit(~/.bashrc)",
-      "Edit(~/.zshrc)",
       "Edit(//etc/**)"
     ],
     "defaultMode": "auto",
