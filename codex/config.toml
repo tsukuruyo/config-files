@@ -1,0 +1,9 @@
+# Merged into ~/.codex/config.toml by mise bootstrap. Codex writes the rest of
+# that file itself (notify, plugins, MCP servers with paths into the app), so
+# only the settings chosen by hand are shared here.
+
+[desktop]
+followUpQueueMode = "steer"
+conversationDetailMode = "STEPS_PROSE"
+ambient-suggestions-enabled = false
+avatar-overlay-pet-visible = false

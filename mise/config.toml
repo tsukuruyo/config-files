@@ -25,6 +25,8 @@ adopt = true
 "brew:git-filter-repo" = "latest"
 "brew:git-lfs" = "latest"
 "brew:gitleaks" = "latest"
+# claude/statusline.sh reads Claude Code's status JSON with it
+"brew:jq" = "latest"
 "brew:just" = "latest"
 "brew:lazygit" = "latest"
 "brew:sheldon" = "latest"
@@ -53,3 +55,11 @@ adopt = true
 "~/.config/starship.toml" = { source = "~/development/config-files/starship/starship.toml" }
 "~/.config/ghostty/config" = { source = "~/development/config-files/ghostty/config" }
 "~/.vimrc" = { source = "~/development/config-files/.vimrc" }
+"~/.claude/CLAUDE.md" = { source = "~/development/config-files/claude/CLAUDE.md" }
+"~/.claude/statusline.sh" = { source = "~/development/config-files/claude/statusline.sh" }
+# Claude Code and Orca rewrite settings.json: merge in the shared keys, keep the rest
+"~/.claude/settings.json/shared" = { source = "~/development/config-files/claude/settings.json", merge = true }
+"~/.codex/AGENTS.md" = { source = "~/development/config-files/codex/AGENTS.md" }
+"~/.codex/keybindings.json" = { source = "~/development/config-files/codex/keybindings.json" }
+# Codex writes paths and MCP servers into config.toml: merge in [desktop] only
+"~/.codex/config.toml/shared" = { source = "~/development/config-files/codex/config.toml", merge = true }

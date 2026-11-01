@@ -16,12 +16,13 @@ fail() {
 }
 
 # A fresh HOME whose brew and mise are stubs. brew sits under its prefix but is
-# not on PATH, as right after installing it. curl is a stub that only logs, so
-# any download attempt shows up in $work/<name>-curl.log.
+# not on PATH, as right after installing it. brew and curl only log, so what
+# bootstrap.sh runs shows up in $work/<name>-brew.log and $work/<name>-curl.log.
+# $work/<name>-apps stands in for /Applications and starts empty.
 new_home() {
   local home=$work/$1
-  mkdir -p "$home/.local/bin" "$work/$1-bin" "$work/$1-prefix/bin"
-  printf '#!/bin/sh\nexit 0\n' >"$work/$1-prefix/bin/brew"
+  mkdir -p "$home/.local/bin" "$work/$1-bin" "$work/$1-prefix/bin" "$work/$1-apps"
+  printf '#!/bin/sh\necho "brew $*" >>"%s"\n' "$work/$1-brew.log" >"$work/$1-prefix/bin/brew"
   printf '#!/bin/sh\necho "curl $*" >>"%s"\n' "$work/$1-curl.log" >"$work/$1-bin/curl"
   printf '#!/bin/sh\nexit 0\n' >"$home/.local/bin/mise"
   chmod +x "$work/$1-prefix/bin/brew" "$work/$1-bin/curl" "$home/.local/bin/mise"
@@ -32,8 +33,8 @@ run_bootstrap() {
   local home=$1 name
   name=$(basename "$home")
   shift
-  HOME=$home HOMEBREW_PREFIX=$work/$name-prefix PATH=$work/$name-bin:/usr/bin:/bin \
-    "$repo/scripts/bootstrap.sh" "$@"
+  HOME=$home HOMEBREW_PREFIX=$work/$name-prefix BOOTSTRAP_APPDIR=$work/$name-apps \
+    PATH=$work/$name-bin:/usr/bin:/bin "$repo/scripts/bootstrap.sh" "$@"
 }
 
 # make bootstrap PROFILE=..., as README.md runs it on a new Mac.
@@ -41,8 +42,8 @@ run_make_bootstrap() {
   local home=$1 name
   name=$(basename "$home")
   shift
-  HOME=$home HOMEBREW_PREFIX=$work/$name-prefix PATH=$work/$name-bin:/usr/bin:/bin \
-    make -s -C "$repo" bootstrap "$@"
+  HOME=$home HOMEBREW_PREFIX=$work/$name-prefix BOOTSTRAP_APPDIR=$work/$name-apps \
+    PATH=$work/$name-bin:/usr/bin:/bin make -s -C "$repo" bootstrap "$@"
 }
 
 # --- bootstrap.sh -----------------------------------------------------------
@@ -57,6 +58,14 @@ done
   fail "miserc.local.toml does not select personal"
 [[ -s $work/personal-curl.log ]] &&
   fail "bootstrap.sh downloaded although brew and mise exist: $(cat "$work/personal-curl.log")"
+# Orca comes from its own tap, which mise can only read with Ruby 3; brew brings its own.
+grep -qx 'brew install --cask stablyai/orca/orca' "$work/personal-brew.log" 2>/dev/null ||
+  fail "bootstrap.sh does not install Orca with brew"
+# An Orca installed by hand (it updates itself) is left alone: brew would refuse to overwrite it.
+mkdir -p "$work/personal-apps/Orca.app"
+: >"$work/personal-brew.log"
+run_bootstrap "$home" personal >/dev/null || fail "bootstrap.sh with Orca already there exited with $?"
+grep -q 'orca' "$work/personal-brew.log" && fail "bootstrap.sh reinstalled an Orca that is already there"
 
 mkdir -p "$home/.config/mise"
 echo 'env = ["kept"]' >"$home/.config/mise/miserc.local.toml"
@@ -87,6 +96,7 @@ run_bootstrap "$home" personal >/dev/null 2>&1 && fail "bootstrap.sh succeeded o
   fail "bootstrap.sh replaced a real config.toml"
 [[ -L $home/.config/mise/config.work.toml ]] && fail "bootstrap.sh linked other files before stopping"
 [[ -e $home/.config/mise/miserc.local.toml ]] && fail "bootstrap.sh wrote miserc.local.toml before stopping"
+[[ -s $work/conflict-file-brew.log ]] && fail "bootstrap.sh ran brew before stopping"
 
 home=$(new_home conflict-link)
 mkdir -p "$home/.config/mise"
@@ -118,12 +128,22 @@ done
 # [dotfiles] sources name ~/development/config-files, so put the repo there.
 mkdir -p "$home/development"
 ln -s "$repo" "$home/development/config-files"
+# ~/.claude/settings.json as Claude Code and Orca leave it: a hook Orca added and a
+# rule approved with "always allow". The merge must keep both.
+mkdir -p "$home/.claude"
+printf '%s\n' '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"orca-hook"}]}]},' \
+  '"permissions":{"allow":["Bash(ls:*)"]}}' >"$home/.claude/settings.json"
+# ~/.codex/config.toml as Codex writes it: its own notify hook and MCP server.
+mkdir -p "$home/.codex"
+printf '%s\n' 'notify = ["codex-notify"]' '' '[mcp_servers.node_repl]' 'command = "node"' >"$home/.codex/config.toml"
 applied=$(HOME=$home MISE_DATA_DIR=$work/data MISE_CACHE_DIR=$work/cache MISE_STATE_DIR=$work/state \
   "$mise_bin" bootstrap --only dotfiles --yes 2>&1) || fail "mise bootstrap --only dotfiles failed: $applied"
 for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore \
   .zshrc:.zshrc .config/sheldon/plugins.toml:sheldon/plugins.toml \
   .config/starship.toml:starship/starship.toml \
-  .config/ghostty/config:ghostty/config .vimrc:.vimrc; do
+  .config/ghostty/config:ghostty/config .vimrc:.vimrc \
+  .claude/CLAUDE.md:claude/CLAUDE.md .claude/statusline.sh:claude/statusline.sh \
+  .codex/AGENTS.md:codex/AGENTS.md .codex/keybindings.json:codex/keybindings.json; do
   target=$home/${pair%%:*} source=$repo/${pair#*:}
   [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$source" ]] ||
     fail "~/${pair%%:*} is not linked to ${pair#*:}"
@@ -164,6 +184,65 @@ pinned=$(grep -cE '^(tag|rev) = ' "$repo/sheldon/plugins.toml" || true)
 [[ $plugins -gt 0 && $plugins == "$pinned" ]] || fail "sheldon pins $pinned of $plugins plugins"
 awk '/^\[plugins\.zsh-syntax-highlighting\]/{p=1;next} /^\[/{p=0} p && /^apply = \["defer"\]/{ok=1} END{exit !ok}' \
   "$repo/sheldon/plugins.toml" || fail "zsh-syntax-highlighting is not deferred to load last"
+
+# Claude Code rewrites settings.json, so only the shared keys are merged into a real file.
+live=$home/.claude/settings.json
+[[ -f $live && ! -L $live ]] || fail "~/.claude/settings.json is not a regular file"
+python3 -I - "$live" "$repo/claude/settings.json" <<'PY' || fail "~/.claude/settings.json did not get the shared keys while keeping its own"
+import json, sys
+live, shared = (json.load(open(p)) for p in sys.argv[1:])
+assert live["permissions"]["deny"] == shared["permissions"]["deny"], "shared deny missing"
+assert live["permissions"]["allow"] == ["Bash(ls:*)"], "approved rule lost"
+assert live["hooks"]["Stop"][0]["hooks"][0]["command"] == "orca-hook", "Orca hook lost"
+assert live["statusLine"] == shared["statusLine"], "statusLine missing"
+PY
+python3 -I - "$repo/claude/settings.json" <<'PY' || fail "claude/settings.json holds keys that belong to one Mac"
+import json, sys
+s = json.load(open(sys.argv[1]))
+# Rules approved on one Mac and hooks installed by Orca stay in that Mac's file.
+assert not {"allow", "ask"} & set(s["permissions"]), "allow/ask are per Mac"
+assert "orca" not in json.dumps(s.get("hooks", {})).lower(), "Orca installs its own hooks"
+PY
+python3 -I - "$repo/claude/settings.json" <<'PY' || fail "claude/settings.json lacks \$schema or keeps transcripts only 30 days"
+import json, sys
+s = json.load(open(sys.argv[1]))
+# Editors validate it against the schema, and transcripts are kept instead of cleared after 30 days.
+assert s.get("$schema") == "https://json.schemastore.org/claude-code-settings.json", "no $schema"
+assert s.get("cleanupPeriodDays", 0) >= 36500, "transcripts are cleared"
+PY
+python3 -I - "$repo/claude/settings.json" <<'PY' || fail "claude/settings.json has keys Claude Code ignores or that the schema replaced"
+import json, sys
+s = json.load(open(sys.argv[1]))
+# Top-level copies of these are not settings, so the restrictions would silently not apply.
+assert not {"disableBypassPermissionsMode", "dangerouslyDisableSandbox", "voiceEnabled"} & set(s), "misplaced or legacy key"
+assert s["permissions"].get("disableBypassPermissionsMode") == "disable", "bypass mode allowed"
+assert s["sandbox"].get("allowUnsandboxedCommands") is False, "commands can leave the sandbox"
+assert s.get("tui") == "fullscreen" and "CLAUDE_CODE_NO_FLICKER" not in s.get("env", {}), "use tui, not the env var"
+PY
+grep -q '{{' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md has an unfilled template placeholder"
+# The global instructions live once, in codex/AGENTS.md; CLAUDE.md imports them and adds
+# only what is Claude Code's own, so the two never drift apart.
+[[ $(grep -v '^\s*$' "$repo/claude/CLAUDE.md" | head -1) == '@~/.codex/AGENTS.md' ]] ||
+  fail "claude/CLAUDE.md does not start by importing ~/.codex/AGENTS.md"
+grep -qx '# 開発スタイル' "$repo/codex/AGENTS.md" || fail "codex/AGENTS.md does not hold the shared instructions"
+grep -qx '# 開発スタイル' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md repeats the shared instructions"
+[[ -x $repo/claude/statusline.sh ]] || fail "claude/statusline.sh is not executable"
+grep -qF '"brew:jq"' "$repo/mise/config.toml" || fail "statusline.sh needs jq, which nothing installs"
+
+# Codex rewrites config.toml too (paths, MCP servers): only [desktop] is shared.
+live=$home/.codex/config.toml
+[[ -f $live && ! -L $live ]] || fail "~/.codex/config.toml is not a regular file"
+grep -qx 'followUpQueueMode = "steer"' "$live" 2>/dev/null || fail "~/.codex/config.toml did not get the shared [desktop] keys"
+grep -qx 'notify = \["codex-notify"\]' "$live" 2>/dev/null &&
+  grep -qx '\[mcp_servers.node_repl\]' "$live" 2>/dev/null ||
+  fail "~/.codex/config.toml lost what Codex wrote there"
+grep -qE '^(notify|\[mcp_servers|\[plugins|\[marketplaces)|/Users/' "$repo/codex/config.toml" 2>/dev/null &&
+  fail "codex/config.toml holds what Codex writes for itself"
+# AGENTS.md is for Codex: no Claude Code tools, no unfilled placeholders.
+grep -qE 'AskUserQuestion|\{\{' "$repo/codex/AGENTS.md" 2>/dev/null && fail "codex/AGENTS.md names a Claude Code tool or a placeholder"
+# Orca has no settings file to manage, and scripts/bootstrap.sh installs the app:
+# as a mise package its tap cask would need Ruby 3 on every new Mac.
+grep -qF 'stablyai/orca' "$repo/mise/config.toml" && fail "mise/config.toml declares Orca, which mise cannot read without Ruby 3"
 
 # Ghostty: one theme (a later one silently wins), and every font is installed by a cask.
 [[ $(grep -c '^theme = ' "$repo/ghostty/config" 2>/dev/null || true) == 1 ]] ||
