@@ -126,6 +126,14 @@ for pair in .gitconfig:.gitconfig .config/git/ignore:git/ignore; do
     fail "~/${pair%%:*} is not linked to ${pair#*:}"
 done
 
+# lazygit reads its config from Application Support on macOS (a path with a space).
+target="$home/Library/Application Support/lazygit/config.yml"
+[[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$repo/lazygit/config.yml" ]] ||
+  fail "lazygit's config.yml is not linked to lazygit/config.yml"
+# A background fetch would ask Bitwarden to approve the SSH key every minute.
+grep -qx '  autoFetch: false' "$repo/lazygit/config.yml" 2>/dev/null ||
+  fail "lazygit/config.yml does not turn off git.autoFetch"
+
 # git as it would run in that HOME, with no outside config leaking in.
 home_git() {
   env -u GIT_CONFIG_GLOBAL -u XDG_CONFIG_HOME HOME="$home" GIT_CONFIG_NOSYSTEM=1 git "$@"

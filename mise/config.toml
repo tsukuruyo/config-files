@@ -43,3 +43,4 @@ adopt = true
 [dotfiles]
 "~/.gitconfig" = { source = "~/development/config-files/.gitconfig" }
 "~/.config/git/ignore" = { source = "~/development/config-files/git/ignore" }
+"~/Library/Application Support/lazygit/config.yml" = { source = "~/development/config-files/lazygit/config.yml" }

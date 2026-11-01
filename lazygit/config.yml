@@ -1,0 +1,13 @@
+gui:
+  wrapLinesInStagingView: true
+git:
+  # A background fetch would ask Bitwarden to approve the SSH key every minute
+  autoFetch: false
+keybinding:
+  universal:
+    return: [<esc>, <ctrl+g>]
+    prevItem: [<up>, <ctrl+p>]
+    nextItem: [<down>, <ctrl+n>]
+    prevPage: [',', <ctrl+meta+v>]
+    nextPage: ['.', <ctrl+v>]
+    createPatchOptionsMenu: <disabled>

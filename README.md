@@ -30,6 +30,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `ssh/config` | SSHのホスト設定。`~/.ssh/config` からIncludeする |
 | `.gitconfig` | `~/.gitconfig` にリンクする。Macごとの設定は `~/.gitconfig.local` と `~/.gitconfig.work` に書く。最後でincludeするので、共通の設定をMacごとに上書きできる |
 | `git/ignore` | gitのグローバルなignore。gitが既定で読む `~/.config/git/ignore` にリンクする |
+| `lazygit/config.yml` | `~/Library/Application Support/lazygit/config.yml` にリンクする。裏でのfetchはBitwardenの承認を毎回求めるので、`git.autoFetch` を止めている |
 
 ## パッケージ
 
