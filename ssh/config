@@ -1,0 +1,11 @@
+# Included from the top of ~/.ssh/config (see README.md).
+# Every key lives in Bitwarden; its agent offers them all, in its own order.
+Host *
+    IdentityAgent   ~/.bitwarden-ssh-agent.sock
+    # Reuse the first connection to a host while it stays open, so Bitwarden
+    # asks once for it rather than once per command
+    ControlMaster   auto
+    ControlPath     ~/.ssh/cm-%C
+    # Keepalive every 10s; drop a dead connection after about 2 minutes
+    ServerAliveInterval 10
+    ServerAliveCountMax 12

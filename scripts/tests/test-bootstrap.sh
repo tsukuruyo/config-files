@@ -113,6 +113,24 @@ for env in personal work; do
   grep -q "config.$other.toml" <<<"$loaded" && fail "env $env also loads config.$other.toml"
 done
 
+# --- ssh --------------------------------------------------------------------
+
+# ~/.ssh/config is not managed here; README.md has it include ssh/config first.
+printf 'Include %s\n' "$repo/ssh/config" >"$work/ssh_config"
+# Keys come only from the Bitwarden agent: no key files, for any host.
+grep -qiE '^[[:space:]]*(IdentityFile|IdentitiesOnly)' "$repo/ssh/config" &&
+  fail "ssh/config names key files instead of leaving keys to the agent"
+for host in github.com bitbucket.org gitlab.com example.com; do
+  resolved=$(ssh -T -F "$work/ssh_config" -G "$host")
+  grep -qx 'identityagent .*/\.bitwarden-ssh-agent\.sock' <<<"$resolved" ||
+    fail "ssh $host does not use the Bitwarden agent"
+  # Reusing one connection means one Bitwarden approval per host, not per git command.
+  grep -qx 'controlmaster auto' <<<"$resolved" || fail "ssh $host does not reuse connections"
+  grep -qx 'controlpath .*/\.ssh/cm-.*' <<<"$resolved" || fail "ssh $host has no ControlPath under ~/.ssh"
+  grep -qx 'serveraliveinterval 10' <<<"$resolved" || fail "ssh $host sends no keepalive every 10s"
+  grep -qx 'serveralivecountmax 12' <<<"$resolved" || fail "ssh $host does not give up after 12 missed keepalives"
+done
+
 if ((failures > 0)); then
   echo "$failures check(s) failed"
   exit 1

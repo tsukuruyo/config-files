@@ -32,6 +32,8 @@ adopt = true
 "brew:starship" = "latest"
 
 # Apps
+# SSH agent that ssh/config sends every host to
+"brew-cask:bitwarden" = "latest"
 "brew-cask:ghostty" = "latest"
 
 # App Store
