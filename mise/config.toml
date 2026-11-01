@@ -68,11 +68,9 @@ adopt = true
 "brew-cask:zoom" = "latest"
 "brew-cask:libreoffice" = "latest"
 
-# Font used by ghostty/config. Not font-biz-udgothic: that cask clones all
+# Font used by ghostty/config and vscode/settings.json. Not font-biz-udgothic: that cask clones all
 # of google/fonts (several GB) and fails partway.
 "brew-cask:font-udev-gothic-nf" = "latest"
-# Font used by vscode/settings.json
-"brew-cask:font-google-sans-code" = "latest"
 
 # App Store
 "brew:mas" = "latest"
@@ -126,10 +124,6 @@ domain = "NSGlobalDomain"
 key = "com.apple.mouse.tapBehavior"
 host = "current"
 value = 1
-
-# Larger mouse pointer (1.0 is the default size, 4.0 the largest)
-[bootstrap.macos.defaults."com.apple.universalaccess"]
-mouseDriverCursorSize = 3.0
 
 [bootstrap.macos.defaults."com.apple.dock"]
 autohide = true

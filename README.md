@@ -17,6 +17,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
   ```
 - 新しいターミナルを開く。~/.zshrcがこのリポジトリの.zshrcになり、初回はsheldonがGitHubからプラグインを取ってくるので少し時間がかかる（ネットワークが必要）
 - Ghosttyを起動し、システム設定 → プライバシーとセキュリティ → アクセシビリティでGhosttyを許可する。quick terminalのグローバルなショートカット（Ctrl+`）に必要なため
+- システム設定 → アクセシビリティ → ディスプレイで「ポインタのサイズ」を大きくする（`mouseDriverCursorSize` が3くらい）。defaultsで書くにはフルディスクアクセスが要るので、mise bootstrapでは設定しない
 - `make skills` を実行して、Claude CodeとCodexのskillsを入れる
 - Orcaを起動し、ホームディレクトリへのアクセスを許可する。初回は~/.claude・~/.codex・Ghosttyの設定を取り込むかを聞かれる。Orcaは自分でClaude Codeのhooksを~/.claude/settings.jsonに書き足し、以降は自動で更新する
 - ~/.gitconfig.localに `[user]` の `name` と `email` を書く。公開リポジトリなので.gitconfigには書かず、.gitconfigの最後でincludeする。仕事用Macだけの設定は~/.gitconfig.workに書く
@@ -75,7 +76,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - `mise/config.toml` の `[bootstrap.macos.defaults]` に書く。今の値は `defaults read <domain> <key>` で確かめられる
 - システム設定で変えたら、`mise/config.toml` にも反映する。反映しないと、次の `mise bootstrap` で元に戻る
 - `mise bootstrap` が書き換えたあとは、案内に従ってDockやFinderを再起動する（`killall Dock` など）
-- アクセシビリティの設定（`com.apple.universalaccess`、マウスカーソルの大きさ）は、ターミナルにフルディスクアクセスがないと書き込めないことがある。`mise bootstrap` が書き込めなかったら、システム設定 → プライバシーとセキュリティ → フルディスクアクセスで、使っているターミナル（GhosttyやOrca）を許可してからもう一度実行する
+- アクセシビリティの設定（`com.apple.universalaccess`）は書かない。フルディスクアクセスのないターミナルからでは書き込めず、`mise bootstrap` が `failed to synchronize macOS preference domain com.apple.universalaccess` で止まるため。「新しいMac」の手順で手で設定する
 
 ## パッケージ
 
@@ -83,7 +84,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
   - Homebrewのformula・cask、App Storeのアプリ: `[bootstrap.packages]` に `brew:` / `brew-cask:` / `mas:` で書く。`mise bootstrap` がbrewの代わりに、Homebrewの場所（/opt/homebrew）へ入れる
   - 言語の実行環境（node・python・rubyなど）: `[tools]` に書く。miseの場所に入る
   - miseで扱えないHomebrewのパッケージ: `scripts/bootstrap.sh` で `brew install` する。miseはHomebrewのAPIの情報をもとに自分で入れるので、APIに情報がない外部のtapのcask（Rubyの定義を評価するのにRuby 3以上が要る）は扱えない。今はOrcaだけ
-- 新しく足すときは、まず `[bootstrap.packages]` に書いて `mise bootstrap --dry-run` で確かめ、miseで扱えなければ `scripts/bootstrap.sh` に回す。大きすぎて取得に失敗するcask（`font-biz-udgothic` はgoogle/fontsを丸ごと取ってくる）は、別のものに替える
+- 新しく足すときは、まず `[bootstrap.packages]` に書いて `mise bootstrap --dry-run` で確かめ、miseで扱えなければ `scripts/bootstrap.sh` に回す。大きすぎて取得に失敗するcask（`font-biz-udgothic` や `font-google-sans-code` など、google/fontsを丸ごと取ってくるもの）は、別のものに替える。`brew info --cask --json=v2 <cask>` の `url` が `https://github.com/google/fonts.git` なら、それにあたる
 - .pkgで入るcask（`google-drive` など）は、インストール中に管理者のパスワードを聞かれることがある
 - 新しいMacでも必ず入れたいものだけを書く。アドホックに `brew install` したものは書かなくてよい
 - 片方のMacでしか使わないものは、`mise/config.toml` ではなく `mise/config.personal.toml` か `mise/config.work.toml` に書く

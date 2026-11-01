@@ -179,8 +179,9 @@ done
 # Printed as a table, a float keeps its .0: macOS checks the type, and a single value would print 3.
 macos=$(cfg bootstrap.macos)
 grep -qx '"com.apple.trackpad.scaling" = 3.0' <<<"$macos" || fail "trackpad scaling is not the float 3.0"
-grep -A1 -x '\[defaults."com.apple.universalaccess"\]' <<<"$macos" | grep -qx 'mouseDriverCursorSize = 3.0' ||
-  fail "the mouse cursor is not enlarged to the float 3.0"
+# Writing accessibility settings needs Full Disk Access, and without it mise bootstrap
+# stops there; README.md has them set by hand, as shibayu36/config-file does.
+grep -q 'universalaccess' <<<"$macos" && fail "mise/config.toml sets accessibility settings, which need Full Disk Access"
 # Tap to click for the login window too lives in the current host's NSGlobalDomain.
 entries=$(sed -n '/^\[\[defaults_entries\]\]/,$p' <<<"$macos")
 { grep -q 'com.apple.mouse.tapBehavior' <<<"$entries" && grep -q 'host = "current"' <<<"$entries"; } ||
@@ -334,6 +335,10 @@ for f in settings.json keybindings.json; do
   target="$home/Library/Application Support/Code/User/$f"
   [[ -L $target && $(cd "$(dirname "$target")" && realpath "$(basename "$target")") == "$repo/vscode/$f" ]] ||
     fail "VS Code's $f is not linked to vscode/$f"
+done
+# These casks clone all of google/fonts (several GB), and mise bootstrap stalls on them.
+for cask in font-biz-udgothic font-google-sans-code; do
+  grep -qF "\"brew-cask:$cask\"" "$repo"/mise/config*.toml && fail "mise declares $cask, which clones all of google/fonts"
 done
 # Like Ghostty's, the editor font comes from a cask.
 vscode_font=$(sed -n "s/.*\"editor.fontFamily\": \"'\([^']*\)'.*/\1/p" "$repo/vscode/settings.json")
