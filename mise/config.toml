@@ -61,6 +61,7 @@ adopt = true
 "brew-cask:notion" = "latest"
 "brew-cask:pearcleaner" = "latest"
 "brew-cask:raycast" = "latest"
+"brew-cask:sequel-ace" = "latest"
 "brew-cask:visual-studio-code" = "latest"
 # These run a .pkg installer, which may ask for an admin password
 "brew-cask:google-japanese-ime" = "latest"
@@ -78,7 +79,6 @@ adopt = true
 "mas:1342896380" = "latest" # Hex Fiend
 "mas:1452453066" = "latest" # Hidden Bar
 "mas:1532419400" = "latest" # MeetingBar
-"mas:1518036000" = "latest" # Sequel Ace
 "mas:457622435" = "latest" # Yoink
 
 [dotfiles]

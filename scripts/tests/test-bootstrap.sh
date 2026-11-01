@@ -127,11 +127,13 @@ done
 # Apps for every Mac, and apps for the personal one only.
 declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
 for pkg in brew-cask:{claude,chatgpt,raycast,arc,google-chrome,visual-studio-code,docker-desktop} \
-  brew-cask:{notion,linear,keka,pearcleaner} \
+  brew-cask:{notion,linear,keka,pearcleaner,sequel-ace} \
   brew-cask:{tailscale-app,zoom,google-japanese-ime,ngrok,libreoffice,google-gemini} \
-  mas:{937984704,1452453066,1532419400,457622435,1518036000,1342896380}; do
+  mas:{937984704,1452453066,1532419400,457622435,1342896380}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
 done
+# Sequel Ace comes from its cask, not also from the App Store.
+grep -qF '"mas:1518036000"' "$repo"/mise/config*.toml && fail "Sequel Ace is declared from the App Store as well as its cask"
 for pkg in brew-cask:{obsidian,lm-studio,comfy,unity-hub,godot,epic-games,adobe-creative-cloud,google-drive,jetbrains-toolbox} \
   mas:{975937182,539883307,905953485,904280696,585829637,1278508951,310633997,1380563956}; do
   declared config.personal.toml "$pkg" || fail "mise/config.personal.toml does not declare $pkg"
