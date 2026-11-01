@@ -147,7 +147,9 @@ grep -q '^dotnet' "$repo/mise/config.toml" && fail "mise/config.toml installs .N
 grep -qF '"brew:dotnet' "$repo"/mise/config*.toml && fail "mise declares .NET as a Homebrew package"
 grep -qF '"brew-cask:dotnet' "$repo"/mise/config*.toml && fail "mise declares .NET as a cask"
 grep -qF '"brew-cask:ngrok"' "$repo/mise/config.personal.toml" && fail "ngrok is declared for the personal Mac only"
-declared config.work.toml brew-cask:slack || fail "mise/config.work.toml does not declare brew-cask:slack"
+for pkg in brew-cask:{slack,microsoft-teams}; do
+  declared config.work.toml "$pkg" || fail "mise/config.work.toml does not declare $pkg"
+done
 for cask in google-drive jetbrains-toolbox; do
   grep -qF "\"brew-cask:$cask\"" "$repo/mise/config.toml" && fail "$cask is declared for every Mac"
 done
