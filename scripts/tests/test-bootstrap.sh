@@ -538,6 +538,21 @@ grep -q '例外' "$repo/AGENTS.md" && fail "AGENTS.md still calls the Makefile a
 sed -n '/^# These run a .pkg installer/,/^$/p' "$repo/mise/config.toml" | grep -q libreoffice &&
   fail "libreoffice sits under the .pkg installer comment"
 
+# GitHub renders text between two ~ as strikethrough, so a path under ~ is a code span.
+bare_tilde=$(python3 -I - "$repo/README.md" "$repo/AGENTS.md" <<'PY2'
+import re, sys
+for path in sys.argv[1:]:
+    fence = False
+    for n, line in enumerate(open(path), 1):
+        if line.lstrip().startswith("```"):
+            fence = not fence
+            continue
+        if not fence and "~" in re.sub(r"`[^`]*`", "", line):
+            print(f"{path.rsplit('/', 1)[-1]}:{n}")
+PY2
+)
+[[ -z $bare_tilde ]] || fail "a ~ outside a code span can turn into strikethrough: $bare_tilde"
+
 if ((failures > 0)); then
   echo "$failures check(s) failed"
   exit 1

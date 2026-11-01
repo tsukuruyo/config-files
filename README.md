@@ -5,7 +5,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 ## 新しいMac
 
 - Xcode Command Line Toolsを入れる（`xcode-select --install`）。初期状態のmacOSにはgitの実体がないため
-- ~/development/config-filesにHTTPSでcloneする（`git clone https://github.com/tsukuruyo/config-files.git ~/development/config-files`）。SSH鍵はBitwardenで管理しており、この時点ではBitwardenが無いためSSHではcloneできない
+- `~/development/config-files`にHTTPSでcloneする（`git clone https://github.com/tsukuruyo/config-files.git ~/development/config-files`）。SSH鍵はBitwardenで管理しており、この時点ではBitwardenが無いためSSHではcloneできない
 - `make bootstrap PROFILE=personal` か `make bootstrap PROFILE=work` を実行する。HomebrewとmiseとOrcaが入る。最後に表示されるコマンドを実行して、今のシェルにbrewのPATHを通す
 - App StoreにApple Accountでサインインしておく。`mas:` の項目（Xcodeなど）は `mas` で入れるため、サインインが必要
 - `~/.local/bin/mise bootstrap` を実行する。`brew:mas` が入ると同じ実行の中で `mas:` の項目も入る。最後のfollow-upに `mas: ... skipped (mas not found)` と出るのは実行前の予定がそのまま表示されたもので、途中に `mise mas:` の行が出ていれば問題ない
@@ -22,13 +22,13 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
   auth       optional       /opt/homebrew/lib/pam/pam_reattach.so ignore_ssh
   auth       sufficient     pam_tid.so
   ```
-- 新しいターミナルを開く。~/.zshrcがこのリポジトリの.zshrcになり、初回はsheldonがGitHubからプラグインを取ってくるので少し時間がかかる（ネットワークが必要）
+- 新しいターミナルを開く。`~/.zshrc`がこのリポジトリの.zshrcになり、初回はsheldonがGitHubからプラグインを取ってくるので少し時間がかかる（ネットワークが必要）
 - Ghosttyを起動し、システム設定 → プライバシーとセキュリティ → アクセシビリティでGhosttyを許可する。quick terminalのグローバルなショートカット（Ctrl+`）に必要なため
 - システム設定 → アクセシビリティ → ディスプレイで「ポインタのサイズ」を大きくする（`mouseDriverCursorSize` が3くらい）。defaultsで書くにはフルディスクアクセスが要るので、mise bootstrapでは設定しない
 - `make skills` を実行して、Claude CodeとCodexのskillsを入れる
-- Orcaを起動し、ホームディレクトリへのアクセスを許可する。初回は~/.claude・~/.codex・Ghosttyの設定を取り込むかを聞かれる。Orcaは自分でClaude Codeのhooksを~/.claude/settings.jsonに書き足し、以降は自動で更新する
-- ~/.gitconfig.localに `[user]` の `name` と `email` を書く。公開リポジトリなので.gitconfigには書かず、.gitconfigの最後でincludeする。仕事用Macだけの設定は~/.gitconfig.workに書く
-- BitwardenにログインしてSSH agentを有効化し、~/.ssh/configの先頭に `Include ~/development/config-files/ssh/config` を書く
+- Orcaを起動し、ホームディレクトリへのアクセスを許可する。初回は`~/.claude`・`~/.codex`・Ghosttyの設定を取り込むかを聞かれる。Orcaは自分でClaude Codeのhooksを`~/.claude/settings.json`に書き足し、以降は自動で更新する
+- `~/.gitconfig.local`に `[user]` の `name` と `email` を書く。公開リポジトリなので.gitconfigには書かず、.gitconfigの最後でincludeする。仕事用Macだけの設定は`~/.gitconfig.work`に書く
+- BitwardenにログインしてSSH agentを有効化し、`~/.ssh/config`の先頭に `Include ~/development/config-files/ssh/config` を書く
 - originをSSHに切り替える（`git remote set-url origin git@github.com:tsukuruyo/config-files.git`）
 
 ## 日々の同期
