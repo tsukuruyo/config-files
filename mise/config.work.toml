@@ -2,5 +2,6 @@
 # This repository is public: keep internal tool names out of it.
 
 [bootstrap.packages]
+"brew-cask:cyberduck" = "latest"
 "brew-cask:microsoft-teams" = "latest"
 "brew-cask:slack" = "latest"
