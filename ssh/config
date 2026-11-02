@@ -2,6 +2,7 @@
 # Every key lives in Bitwarden; its agent offers them all, in its own order.
 Host *
     IdentityAgent   ~/.bitwarden-ssh-agent.sock
+    IdentitiesOnly  yes
     # Reuse the first connection to a host while it stays open, so Bitwarden
     # asks once for it rather than once per command
     ControlMaster   auto
