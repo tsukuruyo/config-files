@@ -102,6 +102,7 @@ autoload -Uz compinit
     compinit -C -d $dump
   fi
 }
+compdef _files diff # 標準 zsh が 5.9 より新しくなったら削除（5.9 の _diff は macOS の diff -u で2つ目を補完できない）
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
 zstyle ':completion:*' menu select
 zstyle ':completion:*' completer _expand _complete _approximate
