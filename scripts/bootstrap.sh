@@ -1,18 +1,24 @@
 #!/bin/bash
-# Install Homebrew, mise and Orca, then hand ~/.config/mise to this repository.
+# Install Homebrew, mise and (on the dev Macs) Orca, then hand ~/.config/mise to this repository.
 # Everything else (packages, dotfiles, macOS defaults) comes from `mise bootstrap`.
-# Usage: make bootstrap PROFILE=personal|work (or scripts/bootstrap.sh personal|work)
+# Usage: make bootstrap PROFILE=personal|work|shop (or scripts/bootstrap.sh personal|work|shop)
 set -eu
 
+# Each Mac's mise envs, in the order they layer on config.toml. The personal and work
+# Macs are dev Macs: they add config.dev.toml under their own file. The shop Mac does not.
 profile=${1:-}
-if [ "$profile" != personal ] && [ "$profile" != work ]; then
-  echo "usage: make bootstrap PROFILE=personal|work" >&2
-  exit 1
-fi
+case $profile in
+  personal | work) envs="\"dev\", \"$profile\"" dev=1 ;;
+  shop) envs="\"shop\"" dev=0 ;;
+  *)
+    echo "usage: make bootstrap PROFILE=personal|work|shop" >&2
+    exit 1
+    ;;
+esac
 
 repo=$(cd "$(dirname "$0")/.." && pwd -P)
 config_dir=$HOME/.config/mise
-configs="config.toml config.personal.toml config.work.toml"
+configs="config.toml config.dev.toml config.personal.toml config.work.toml config.shop.toml"
 # Look where brew lives, not on PATH: right after installing it, it is not on PATH yet.
 brew_bin=${HOMEBREW_PREFIX:-/opt/homebrew}/bin/brew
 appdir=${BOOTSTRAP_APPDIR:-/Applications}
@@ -42,8 +48,8 @@ fi
 
 # Orca's cask lives in stablyai's own tap. mise can read a tap cask only with
 # Ruby 3, which a new Mac lacks, so brew (which bundles its Ruby) installs it.
-# An Orca installed by hand is left alone: it updates itself.
-if [ ! -d "$appdir/Orca.app" ]; then
+# An Orca installed by hand is left alone: it updates itself. The shop Mac does not get it.
+if [ "$dev" = 1 ] && [ ! -d "$appdir/Orca.app" ]; then
   "$brew_bin" install --cask stablyai/orca/orca
 fi
 
@@ -53,7 +59,7 @@ for f in $configs; do
 done
 # Kept across runs: it is this Mac's choice, not the repository's.
 if [ ! -e "$config_dir/miserc.local.toml" ]; then
-  echo "env = [\"$profile\"]" >"$config_dir/miserc.local.toml"
+  echo "env = [$envs]" >"$config_dir/miserc.local.toml"
 fi
 
 echo 'Load brew into this shell, then run ~/.local/bin/mise bootstrap:'

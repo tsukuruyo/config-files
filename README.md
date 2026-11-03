@@ -6,7 +6,8 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 
 - Xcode Command Line Toolsを入れる（`xcode-select --install`）。初期状態のmacOSにはgitの実体がないため
 - `~/development/config-files`にHTTPSでcloneする（`git clone https://github.com/tsukuruyo/config-files.git ~/development/config-files`）。SSH鍵はBitwardenで管理しており、この時点ではBitwardenが無いためSSHではcloneできない
-- `make bootstrap PROFILE=personal` か `make bootstrap PROFILE=work` を実行する。HomebrewとmiseとOrcaが入る。最後に表示されるコマンドを実行して、今のシェルにbrewのPATHを通す
+- `make bootstrap PROFILE=personal`・`make bootstrap PROFILE=work`・`make bootstrap PROFILE=shop` のどれかを実行する。HomebrewとmiseとOrcaが入る。最後に表示されるコマンドを実行して、今のシェルにbrewのPATHを通す
+  - `shop` は店のMac用。`mise/config.toml`（シェル・git・Ghostty・Chromeなど）と `mise/config.shop.toml` だけが入り、開発用の `mise/config.dev.toml` とOrcaは入らない。以下の手順のうち、Orca・`make skills`・Claude CodeとCodexに関するものは飛ばす
 - App StoreにApple Accountでサインインしておく。`mas:` の項目（Xcodeなど）は `mas` で入れるため、サインインが必要
 - `~/.local/bin/mise bootstrap` を実行する。`brew:mas` が入ると同じ実行の中で `mas:` の項目も入る。最後のfollow-upに `mas: ... skipped (mas not found)` と出るのは実行前の予定がそのまま表示されたもので、途中に `mise mas:` の行が出ていれば問題ない
 - caskもApp Storeもないアプリを手で入れる
@@ -43,12 +44,14 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | ファイル | 役割 |
 | --- | --- |
 | `Makefile` | このリポジトリのタスク（`bootstrap`・`plan`・`status`・`sync`・`lint`・`skills`）。新しいMacで最初から使えるタスクランナーはmakeだけなので、justfileではなくmakeにする。`brew:just` は、ほかのリポジトリで使うために入れている |
-| `scripts/bootstrap.sh` | Homebrew・mise・Orcaを入れ、`mise/` を `~/.config/mise` にリンクする |
+| `scripts/bootstrap.sh` | Homebrew・mise・Orca（開発Macだけ）を入れ、`mise/` を `~/.config/mise` にリンクする |
 | `scripts/install-skills.sh` | Claude CodeとCodexのskillsを、skills CLI（`pnpx skills add`）で入れ直す。`make skills` で実行する |
-| `mise/config.toml` | すべてのMacで共通の設定 |
+| `mise/config.toml` | すべてのMacで共通の設定。店のMacにも入れるもの（シェル・git・Ghostty・macOSの設定・Chromeなどのアプリ）だけ |
+| `mise/config.dev.toml` | 私物Macと仕事Macで共通の、開発用の設定（言語・Docker・VS Code・Claude CodeとCodexなど）。店のMacでは読まない |
 | `mise/config.personal.toml` | 私物Macだけの設定 |
 | `mise/config.work.toml` | 仕事Macだけの設定。公開リポジトリなので社内ツールの名前などは書かない |
-| `~/.config/mise/miserc.local.toml` | Macごとにenvを選ぶ。`scripts/bootstrap.sh` が最初に1回だけ書き、Git管理しない |
+| `mise/config.shop.toml` | 店のMacだけの設定 |
+| `~/.config/mise/miserc.local.toml` | Macごとにenvを選ぶ。私物Macは `env = ["dev", "personal"]`、仕事Macは `env = ["dev", "work"]`、店のMacは `env = ["shop"]` で、この順に `config.<env>.toml` が `config.toml` に重なる。`scripts/bootstrap.sh` が最初に1回だけ書き、Git管理しない |
 | `ssh/config` | SSHのホスト設定。`~/.ssh/config` からIncludeする |
 | `.gitconfig` | `~/.gitconfig` にリンクする。Macごとの設定は `~/.gitconfig.local` と `~/.gitconfig.work` に書く。最後でincludeするので、共通の設定をMacごとに上書きできる。diffはdelta（`brew:git-delta`）で表示する |
 | `git/ignore` | gitのグローバルなignore。gitが既定で読む `~/.config/git/ignore` にリンクする |
@@ -93,13 +96,13 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 
 - 入れ方は3つに分ける
   - Homebrewのformula・cask、App Storeのアプリ: `[bootstrap.packages]` に `brew:` / `brew-cask:` / `mas:` で書く。`mise bootstrap` がbrewの代わりに、Homebrewの場所（/opt/homebrew）へ入れる
-  - 言語の実行環境（node・python・rubyなど）: `[tools]` に書く。miseの場所に入る
+  - 言語の実行環境（node・python・rubyなど）: `[tools]` に書く（`mise/config.dev.toml`）。miseの場所に入る
   - miseで扱えないHomebrewのパッケージ: `scripts/bootstrap.sh` で `brew install` する。miseはHomebrewのAPIの情報をもとに自分で入れるので、APIに情報がない外部のtapのcask（Rubyの定義を評価するのにRuby 3以上が要る）は扱えない。今はOrcaだけ
 - 新しく足すときは、まず `[bootstrap.packages]` に書いて `mise bootstrap --dry-run` で確かめ、miseで扱えなければ `scripts/bootstrap.sh` に回す。大きすぎて取得に失敗するcask（`font-biz-udgothic` や `font-google-sans-code` など、google/fontsを丸ごと取ってくるもの）は、別のものに替える。`brew info --cask --json=v2 <cask>` の `url` が `https://github.com/google/fonts.git` なら、それにあたる
 - .pkgで入るcask（`google-drive` など）は、インストール中に管理者のパスワードを聞かれることがある
 - kubectlは宣言しない。Docker Desktop（`brew-cask:docker-desktop`）が `/usr/local/bin/kubectl` に自分のものを置くので、それを使う（`.zshrc` の `kc` もこれを呼ぶ）
 - 新しいMacでも必ず入れたいものだけを書く。アドホックに `brew install` したものは書かなくてよい
-- 片方のMacでしか使わないものは、`mise/config.toml` ではなく `mise/config.personal.toml` か `mise/config.work.toml` に書く
+- 店のMacにも入れるものだけを `mise/config.toml` に書く。私物Macと仕事Macで使う開発用のものは `mise/config.dev.toml` に、1台のMacでしか使わないものは `mise/config.personal.toml`・`mise/config.work.toml`・`mise/config.shop.toml` に書く
 - `mise bootstrap packages status --missing` で、宣言した項目が揃っているか確認できる
 - `mise bootstrap packages prune --dry-run` で、宣言にないformulaを一覧できる。`--dry-run` を外すと実際に削除される
 - 宣言にないcaskとApp Storeのアプリはpruneでは検出できない。`brew list --cask` と `mas list` を目で見る

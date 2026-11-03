@@ -1,5 +1,6 @@
-# Shared by the personal and work Macs.
-# Anything only one Mac needs goes in config.<env>.toml.
+# Shared by every Mac, the shop one included: the shell, git, the terminal, a few apps and the
+# macOS settings. What only the dev Macs (personal and work) need goes in config.dev.toml, and
+# what only one Mac needs in config.<env>.toml.
 
 # The version these files were tested with: dotfile merges are recent.
 min_version = "2026.10.24"
@@ -8,14 +9,6 @@ min_version = "2026.10.24"
 minimum_release_age = "7d"
 idiomatic_version_file_enable_tools = ["python", "ruby", "node"]
 
-# Defaults outside projects, which pin their own versions in .node-version etc.
-# Loose enough to get patch releases, tight enough to never jump a minor/major.
-[tools]
-node = "lts"
-python = "3.15.2"
-ruby = "3.4"
-pnpm = "12"
-
 [bootstrap.brew]
 # Bring apps installed by hand under Homebrew instead of failing on them
 adopt = true
@@ -23,88 +16,44 @@ adopt = true
 [bootstrap.packages]
 # Basic tools
 "brew:fzf" = "latest"
+# .gitconfig takes GitHub's HTTPS credentials from it
 "brew:gh" = "latest"
-"brew:ghq" = "latest"
 # Newer than the git in the Xcode Command Line Tools
 "brew:git" = "latest"
-# .gitconfig and lazygit show diffs through it
+# .gitconfig (and lazygit, on the dev Macs) shows diffs through it
 "brew:git-delta" = "latest"
-"brew:git-filter-repo" = "latest"
-"brew:git-lfs" = "latest"
-"brew:gitleaks" = "latest"
-# claude/statusline.sh reads Claude Code's status JSON with it
-"brew:jq" = "latest"
-"brew:just" = "latest"
-"brew:lazygit" = "latest"
 # Touch ID for sudo also inside terminals Orca runs (README.md has the one-time setup)
 "brew:pam-reattach" = "latest"
 "brew:ripgrep" = "latest"
 "brew:sheldon" = "latest"
-"brew:shellcheck" = "latest"
-"brew:sops" = "latest"
 "brew:starship" = "latest"
 
 # Apps
 # SSH agent that ssh/config sends every host to
 "brew-cask:bitwarden" = "latest"
 "brew-cask:ghostty" = "latest"
-"brew-cask:arc" = "latest"
-"brew-cask:chatgpt" = "latest"
-"brew-cask:claude" = "latest"
-"brew-cask:docker-desktop" = "latest"
 "brew-cask:google-chrome" = "latest"
-"brew-cask:google-gemini" = "latest"
 "brew-cask:keka" = "latest"
-"brew-cask:libreoffice" = "latest"
-"brew-cask:linear" = "latest"
-"brew-cask:ngrok" = "latest"
-"brew-cask:notion" = "latest"
-"brew-cask:pearcleaner" = "latest"
 "brew-cask:raycast" = "latest"
-"brew-cask:sequel-ace" = "latest"
-"brew-cask:visual-studio-code" = "latest"
 # These run a .pkg installer, which may ask for an admin password
 "brew-cask:google-japanese-ime" = "latest"
-"brew-cask:tailscale-app" = "latest"
 "brew-cask:zoom" = "latest"
 
 # Font used by ghostty/config and vscode/settings.json. Not font-biz-udgothic: that cask clones all
 # of google/fonts (several GB) and fails partway.
 "brew-cask:font-udev-gothic-nf" = "latest"
 
-# App Store
+# App Store: the apps themselves are in config.dev.toml and config.<env>.toml
 "brew:mas" = "latest"
-"mas:497799835" = "latest" # Xcode
-"mas:937984704" = "latest" # Amphetamine
-"mas:1342896380" = "latest" # Hex Fiend
-"mas:1452453066" = "latest" # Hidden Bar
-"mas:1532419400" = "latest" # MeetingBar
-"mas:457622435" = "latest" # Yoink
 
 [dotfiles]
 "~/.gitconfig" = { source = "~/development/config-files/.gitconfig" }
 "~/.config/git/ignore" = { source = "~/development/config-files/git/ignore" }
-"~/Library/Application Support/lazygit/config.yml" = { source = "~/development/config-files/lazygit/config.yml" }
 "~/.zshrc" = { source = "~/development/config-files/.zshrc" }
 "~/.config/sheldon/plugins.toml" = { source = "~/development/config-files/sheldon/plugins.toml" }
 "~/.config/starship.toml" = { source = "~/development/config-files/starship/starship.toml" }
 "~/.config/ghostty/config" = { source = "~/development/config-files/ghostty/config" }
 "~/.vimrc" = { source = "~/development/config-files/.vimrc" }
-# The same 7-day release age as [settings] minimum_release_age, for npm/pnpm and yarn
-"~/.npmrc" = { source = "~/development/config-files/.npmrc" }
-"~/.yarnrc.yml" = { source = "~/development/config-files/.yarnrc.yml" }
-"~/Library/Preferences/pnpm/config.yaml" = { source = "~/development/config-files/pnpm/config.yaml" }
-"~/Library/Application Support/Code/User/settings.json" = { source = "~/development/config-files/vscode/settings.json" }
-"~/Library/Application Support/Code/User/keybindings.json" = { source = "~/development/config-files/vscode/keybindings.json" }
-"~/.claude/CLAUDE.md" = { source = "~/development/config-files/claude/CLAUDE.md" }
-"~/.claude/statusline.sh" = { source = "~/development/config-files/claude/statusline.sh" }
-"~/.claude/keybindings.json" = { source = "~/development/config-files/claude/keybindings.json" }
-# Claude Code and Orca rewrite settings.json: merge in the shared keys, keep the rest
-"~/.claude/settings.json/shared" = { source = "~/development/config-files/claude/settings.json", merge = true }
-"~/.codex/AGENTS.md" = { source = "~/development/config-files/codex/AGENTS.md" }
-"~/.codex/keybindings.json" = { source = "~/development/config-files/codex/keybindings.json" }
-# Codex writes paths and MCP servers into config.toml: merge in [desktop] only
-"~/.codex/config.toml/shared" = { source = "~/development/config-files/codex/config.toml", merge = true }
 
 # macOS settings, as this Mac already had them unless noted.
 # Integers, as System Settings stores them: a float differs in type and is rewritten every run

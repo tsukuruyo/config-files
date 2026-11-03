@@ -1,0 +1,6 @@
+# Loaded on top of config.toml when miserc.local.toml sets env = ["shop"]: the Mac at the shop.
+# It does not load config.dev.toml, so only config.toml and this file apply there.
+
+[bootstrap.packages]
+# App Store
+"mas:539883307" = "latest" # LINE

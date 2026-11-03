@@ -1,0 +1,65 @@
+# Loaded on top of config.toml on the dev Macs: miserc.local.toml sets env = ["dev", "personal"]
+# or env = ["dev", "work"]. What the personal and work Macs share but the shop Mac does not need.
+
+# Defaults outside projects, which pin their own versions in .node-version etc.
+# Loose enough to get patch releases, tight enough to never jump a minor/major.
+[tools]
+node = "lts"
+python = "3.15.2"
+ruby = "3.4"
+pnpm = "12"
+
+[bootstrap.packages]
+# Basic tools
+"brew:ghq" = "latest"
+"brew:git-filter-repo" = "latest"
+"brew:git-lfs" = "latest"
+"brew:gitleaks" = "latest"
+# claude/statusline.sh reads Claude Code's status JSON with it
+"brew:jq" = "latest"
+"brew:just" = "latest"
+"brew:lazygit" = "latest"
+"brew:shellcheck" = "latest"
+"brew:sops" = "latest"
+
+# Apps
+"brew-cask:arc" = "latest"
+"brew-cask:chatgpt" = "latest"
+"brew-cask:claude" = "latest"
+"brew-cask:docker-desktop" = "latest"
+"brew-cask:google-gemini" = "latest"
+"brew-cask:libreoffice" = "latest"
+"brew-cask:linear" = "latest"
+"brew-cask:ngrok" = "latest"
+"brew-cask:notion" = "latest"
+"brew-cask:pearcleaner" = "latest"
+"brew-cask:sequel-ace" = "latest"
+"brew-cask:visual-studio-code" = "latest"
+# Runs a .pkg installer, which may ask for an admin password
+"brew-cask:tailscale-app" = "latest"
+
+# App Store
+"mas:497799835" = "latest" # Xcode
+"mas:937984704" = "latest" # Amphetamine
+"mas:1342896380" = "latest" # Hex Fiend
+"mas:1452453066" = "latest" # Hidden Bar
+"mas:1532419400" = "latest" # MeetingBar
+"mas:457622435" = "latest" # Yoink
+
+[dotfiles]
+"~/Library/Application Support/lazygit/config.yml" = { source = "~/development/config-files/lazygit/config.yml" }
+# The same 7-day release age as config.toml's [settings] minimum_release_age, for npm/pnpm and yarn
+"~/.npmrc" = { source = "~/development/config-files/.npmrc" }
+"~/.yarnrc.yml" = { source = "~/development/config-files/.yarnrc.yml" }
+"~/Library/Preferences/pnpm/config.yaml" = { source = "~/development/config-files/pnpm/config.yaml" }
+"~/Library/Application Support/Code/User/settings.json" = { source = "~/development/config-files/vscode/settings.json" }
+"~/Library/Application Support/Code/User/keybindings.json" = { source = "~/development/config-files/vscode/keybindings.json" }
+"~/.claude/CLAUDE.md" = { source = "~/development/config-files/claude/CLAUDE.md" }
+"~/.claude/statusline.sh" = { source = "~/development/config-files/claude/statusline.sh" }
+"~/.claude/keybindings.json" = { source = "~/development/config-files/claude/keybindings.json" }
+# Claude Code and Orca rewrite settings.json: merge in the shared keys, keep the rest
+"~/.claude/settings.json/shared" = { source = "~/development/config-files/claude/settings.json", merge = true }
+"~/.codex/AGENTS.md" = { source = "~/development/config-files/codex/AGENTS.md" }
+"~/.codex/keybindings.json" = { source = "~/development/config-files/codex/keybindings.json" }
+# Codex writes paths and MCP servers into config.toml: merge in [desktop] only
+"~/.codex/config.toml/shared" = { source = "~/development/config-files/codex/config.toml", merge = true }

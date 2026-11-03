@@ -52,12 +52,13 @@ run_make_bootstrap() {
 
 home=$(new_home personal)
 run_bootstrap "$home" personal >/dev/null || fail "bootstrap.sh personal exited with $?"
-for f in config.toml config.personal.toml config.work.toml; do
+for f in config.toml config.dev.toml config.personal.toml config.work.toml config.shop.toml; do
   link=$home/.config/mise/$f
   [[ -L $link && $(readlink "$link") == "$repo/mise/$f" ]] || fail "~/.config/mise/$f is not linked to mise/$f"
 done
-[[ $(cat "$home/.config/mise/miserc.local.toml" 2>/dev/null) == 'env = ["personal"]' ]] ||
-  fail "miserc.local.toml does not select personal"
+# The dev Macs layer config.dev.toml under their own file.
+[[ $(cat "$home/.config/mise/miserc.local.toml" 2>/dev/null) == 'env = ["dev", "personal"]' ]] ||
+  fail "miserc.local.toml does not select dev and personal"
 [[ -s $work/personal-curl.log ]] &&
   fail "bootstrap.sh downloaded although brew and mise exist: $(cat "$work/personal-curl.log")"
 # Orca comes from its own tap, which mise can only read with Ruby 3; brew brings its own.
@@ -69,6 +70,13 @@ mkdir -p "$work/personal-apps/Orca.app"
 run_bootstrap "$home" personal >/dev/null || fail "bootstrap.sh with Orca already there exited with $?"
 grep -q 'orca' "$work/personal-brew.log" && fail "bootstrap.sh reinstalled an Orca that is already there"
 
+# The shop Mac gets the shared layer and its own, without the dev layer or Orca.
+home=$(new_home shop)
+run_bootstrap "$home" shop >/dev/null || fail "bootstrap.sh shop exited with $?"
+[[ $(cat "$home/.config/mise/miserc.local.toml" 2>/dev/null) == 'env = ["shop"]' ]] ||
+  fail "miserc.local.toml does not select shop only"
+grep -q 'orca' "$work/shop-brew.log" 2>/dev/null && fail "bootstrap.sh installed Orca on the shop Mac"
+
 mkdir -p "$home/.config/mise"
 echo 'env = ["kept"]' >"$home/.config/mise/miserc.local.toml"
 run_bootstrap "$home" work >/dev/null || fail "second bootstrap.sh run exited with $?"
@@ -77,8 +85,8 @@ run_bootstrap "$home" work >/dev/null || fail "second bootstrap.sh run exited wi
 
 home=$(new_home make)
 run_make_bootstrap "$home" PROFILE=work >/dev/null 2>&1 || fail "make bootstrap PROFILE=work failed"
-[[ $(cat "$home/.config/mise/miserc.local.toml" 2>/dev/null) == 'env = ["work"]' ]] ||
-  fail "make bootstrap PROFILE=work does not select work"
+[[ $(cat "$home/.config/mise/miserc.local.toml" 2>/dev/null) == 'env = ["dev", "work"]' ]] ||
+  fail "make bootstrap PROFILE=work does not select dev and work"
 
 home=$(new_home make-noprofile)
 run_make_bootstrap "$home" >/dev/null 2>&1 && fail "make bootstrap without PROFILE succeeded"
@@ -117,20 +125,45 @@ run_bootstrap "$home" personal >/dev/null 2>&1 && fail "bootstrap.sh succeeded w
 
 home=$(new_home mise)
 run_bootstrap "$home" personal >/dev/null || true
-for env in personal work; do
-  other=$([[ $env == personal ]] && echo work || echo personal)
+# Each Mac's envs, as bootstrap.sh writes them: every file layers on config.toml in this order,
+# and nothing else is read. The shop Mac never sees config.dev.toml.
+for envs in dev,personal dev,work shop; do
   loaded=$(HOME=$home MISE_DATA_DIR=$work/data MISE_CACHE_DIR=$work/cache MISE_STATE_DIR=$work/state \
-    "$mise_bin" -E "$env" config ls 2>&1) || fail "mise -E $env config ls failed: $loaded"
-  grep -q "config.$env.toml" <<<"$loaded" || fail "env $env does not load config.$env.toml"
-  grep -q "config.$other.toml" <<<"$loaded" && fail "env $env also loads config.$other.toml"
+    MISE_ENV=$envs "$mise_bin" config ls 2>&1) || fail "MISE_ENV=$envs mise config ls failed: $loaded"
+  files=$(sed -n 's|^[^ ]*/\(config[.a-z]*\.toml\) .*|\1|p' <<<"$loaded" | tr '\n' ' ')
+  want="config.toml "
+  for env in ${envs//,/ }; do want+="config.$env.toml "; done
+  [[ $files == "$want" ]] || fail "MISE_ENV=$envs loads '$files', want '$want'"
 done
-# Apps for every Mac, and apps for the personal one only.
+# Apps for every Mac, the shop one included: the shell, git, the terminal and a few apps.
 declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
-for pkg in brew-cask:{claude,chatgpt,raycast,arc,google-chrome,visual-studio-code,docker-desktop} \
-  brew-cask:{notion,linear,keka,pearcleaner,sequel-ace} \
-  brew-cask:{tailscale-app,zoom,google-japanese-ime,ngrok,libreoffice,google-gemini} \
-  mas:{937984704,1452453066,1532419400,457622435,1342896380}; do
+for pkg in brew:{fzf,gh,git,git-delta,mas,pam-reattach,ripgrep,sheldon,starship} \
+  brew-cask:{bitwarden,ghostty,google-chrome,google-japanese-ime,keka,raycast,zoom,font-udev-gothic-nf}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
+done
+# The dev tools, for the personal and work Macs only.
+for pkg in brew:{ghq,git-filter-repo,git-lfs,gitleaks,jq,just,lazygit,shellcheck,sops} \
+  brew-cask:{claude,chatgpt,arc,visual-studio-code,docker-desktop} \
+  brew-cask:{notion,linear,pearcleaner,sequel-ace} \
+  brew-cask:{tailscale-app,ngrok,libreoffice,google-gemini} \
+  mas:{497799835,937984704,1452453066,1532419400,457622435,1342896380}; do
+  declared config.dev.toml "$pkg" || fail "mise/config.dev.toml does not declare $pkg"
+  declared config.toml "$pkg" && fail "$pkg is declared for the shop Mac too"
+done
+# Languages are dev tools too: config.toml installs none on the shop Mac.
+grep -q '^\[tools\]' "$repo/mise/config.toml" && fail "mise/config.toml installs languages on every Mac"
+for tool in node python ruby pnpm; do
+  grep -q "^$tool = " "$repo/mise/config.dev.toml" || fail "mise/config.dev.toml does not install $tool"
+done
+# The shop Mac adds LINE, as the personal one does: the two envs never load together.
+declared config.shop.toml mas:539883307 || fail "mise/config.shop.toml does not declare LINE"
+# Dotfiles for the dev tools go with them; the shell, git and the terminal are for every Mac.
+for key in .claude/ .codex/ Code/User/ .npmrc .yarnrc.yml pnpm/config.yaml lazygit/config.yml; do
+  grep -F -- "$key" "$repo/mise/config.toml" | grep -q '^"~' && fail "mise/config.toml links $key on the shop Mac too"
+  grep -F -- "$key" "$repo/mise/config.dev.toml" | grep -q '^"~' || fail "mise/config.dev.toml does not link $key"
+done
+for key in .gitconfig git/ignore .zshrc sheldon/plugins.toml starship.toml ghostty/config .vimrc; do
+  grep -F -- "$key" "$repo/mise/config.toml" | grep -q '^"~' || fail "mise/config.toml does not link $key for every Mac"
 done
 # Sequel Ace comes from its cask, not also from the App Store.
 grep -qF '"mas:1518036000"' "$repo"/mise/config*.toml && fail "Sequel Ace is declared from the App Store as well as its cask"
@@ -377,7 +410,7 @@ grep -q 'アサーションを弱め' "$repo/codex/AGENTS.md" || fail "codex/AGE
 # The note for people reading claude/CLAUDE.md is an HTML comment, which Claude Code strips.
 grep -q '^共通の指示は' "$repo/claude/CLAUDE.md" && fail "claude/CLAUDE.md loads its maintainer note as an instruction"
 [[ -x $repo/claude/statusline.sh ]] || fail "claude/statusline.sh is not executable"
-grep -qF '"brew:jq"' "$repo/mise/config.toml" || fail "statusline.sh needs jq, which nothing installs"
+grep -qF '"brew:jq"' "$repo/mise/config.dev.toml" || fail "statusline.sh needs jq, which nothing installs"
 
 # Codex rewrites config.toml too (paths, MCP servers): only [desktop] is shared.
 live=$home/.codex/config.toml
@@ -510,7 +543,7 @@ done
 [[ $(sed -n 's/^\([a-z][a-z-]*\):.*/\1/p' "$repo/Makefile" | sort | tr '\n' ' ') == "bootstrap lint plan skills status sync " ]] ||
   fail "Makefile does not have exactly bootstrap, lint, plan, skills, status and sync"
 grep -qx '\.PHONY: bootstrap lint plan skills status sync' "$repo/Makefile" || fail "Makefile targets are not all .PHONY"
-grep -qF '"brew:shellcheck"' "$repo/mise/config.toml" || fail "make lint needs shellcheck, which nothing installs"
+grep -qF '"brew:shellcheck"' "$repo/mise/config.dev.toml" || fail "make lint needs shellcheck, which nothing installs"
 # What each target would run, without running it.
 dry() { make -s -C "$repo" -n "$1" 2>/dev/null || true; }
 [[ $(dry plan) == 'mise bootstrap --dry-run' ]] || fail "make plan does not dry-run mise bootstrap"

@@ -3,7 +3,7 @@
 
 .PHONY: bootstrap lint plan skills status sync
 
-# Install Homebrew, mise and Orca and link mise/ (usage: make bootstrap PROFILE=personal|work)
+# Install Homebrew, mise and Orca and link mise/ (usage: make bootstrap PROFILE=personal|work|shop)
 bootstrap:
 	scripts/bootstrap.sh $(PROFILE)
 
