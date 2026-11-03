@@ -26,6 +26,8 @@ pnpm = "12"
 "brew-cask:arc" = "latest"
 "brew-cask:chatgpt" = "latest"
 "brew-cask:claude" = "latest"
+# Codex CLI. The Codex desktop app cask was discontinued in favour of the ChatGPT app above
+"brew-cask:codex" = "latest"
 "brew-cask:docker-desktop" = "latest"
 "brew-cask:google-gemini" = "latest"
 "brew-cask:libreoffice" = "latest"
