@@ -18,7 +18,7 @@ status:
 # Pull the latest config and apply it
 sync:
 	git pull
-	mise bootstrap
+	mise bootstrap --verbose
 
 # Install the agent skills for Claude Code and Codex
 skills:
