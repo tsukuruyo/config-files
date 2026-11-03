@@ -56,12 +56,12 @@ adopt = true
 "~/.vimrc" = { source = "~/development/config-files/.vimrc" }
 
 # macOS settings, as this Mac already had them unless noted.
-# Integers, as System Settings stores them: a float differs in type and is rewritten every run
-[bootstrap.macos.keyboard]
-key_repeat = 2
-initial_key_repeat = 15
-
 [bootstrap.macos.defaults.NSGlobalDomain]
+# Floats, as macOS stores them (it turns even `defaults write -int` into one): a value counts as
+# set only when its type matches, so [bootstrap.macos.keyboard], which writes integers, rewrote
+# them every run. Lower is faster and shorter.
+KeyRepeat = 2.0
+InitialKeyRepeat = 15.0
 NSAutomaticCapitalizationEnabled = false
 # Pasted code and commands keep their straight quotes and double hyphens
 NSAutomaticQuoteSubstitutionEnabled = false
