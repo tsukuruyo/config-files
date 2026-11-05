@@ -1,7 +1,7 @@
 # make is the one task runner a new Mac has (from the Xcode Command Line Tools),
 # so this repository keeps its tasks here rather than in a justfile.
 
-.PHONY: bootstrap lint plan skills status sync
+.PHONY: bootstrap lint plan skills status sync upgrade
 
 # Install Homebrew, mise and Orca and link mise/ (usage: make bootstrap PROFILE=personal|work|shop)
 bootstrap:
@@ -19,6 +19,14 @@ status:
 sync:
 	git pull
 	mise bootstrap --verbose
+
+# Upgrade the Homebrew packages and mise tools and remove what is no longer needed
+upgrade:
+	brew update
+	brew upgrade
+	brew autoremove
+	brew cleanup --prune=all
+	mise upgrade
 
 # Install the agent skills for Claude Code and Codex
 skills:
