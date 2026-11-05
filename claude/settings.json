@@ -5,7 +5,6 @@
     "ENABLE_TOOL_SEARCH": "1",
     "CLAUDE_CODE_SCROLL_SPEED": "5"
   },
-  "model": "fable[1m]",
   "disableSkillShellExecution": true,
   "statusLine": {
     "type": "command",
