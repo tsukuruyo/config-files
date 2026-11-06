@@ -55,6 +55,9 @@ adopt = true
 "~/.config/ghostty/config" = { source = "~/development/config-files/ghostty/config" }
 "~/.vimrc" = { source = "~/development/config-files/.vimrc" }
 
+[tools]
+python = "3.15"
+
 # macOS settings, as this Mac already had them unless noted.
 [bootstrap.macos.defaults.NSGlobalDomain]
 # Floats, as macOS stores them (it turns even `defaults write -int` into one): a value counts as

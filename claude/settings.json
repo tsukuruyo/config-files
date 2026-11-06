@@ -5,6 +5,7 @@
     "ENABLE_TOOL_SEARCH": "1",
     "CLAUDE_CODE_SCROLL_SPEED": "5"
   },
+  "cleanupPeriodDays": 876000,
   "disableSkillShellExecution": true,
   "statusLine": {
     "type": "command",
@@ -66,18 +67,85 @@
   "language": "Japanese",
   "sandbox": {
     "enabled": true,
-    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
     "autoAllowBashIfSandboxed": true,
+    "failIfUnavailable": true,
     "network": {
       "allowLocalBinding": true
     },
     "excludedCommands": [
-      "docker *"
+      "docker build *",
+      "docker compose *",
+      "docker ps *",
+      "docker logs *",
+      "docker images *",
+      "gh *",
+      "git fetch *",
+      "git pull *",
+      "git push *"
     ],
-    "allowUnsandboxedCommands": false
+    "credentials": {
+      "files": [
+        {
+          "path": "~/.ssh",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.aws",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.azure",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.kube",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.gnupg",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.git-credentials",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.config/gh",
+          "mode": "deny"
+        }
+      ],
+      "envVars": [
+        {
+          "name": "GITHUB_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "GH_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "mode": "deny"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "mode": "deny"
+        },
+        {
+          "name": "AWS_SESSION_TOKEN",
+          "mode": "deny"
+        }
+      ]
+    }
   },
   "effortLevel": "high",
-  "autoUpdatesChannel": "latest",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "autoUpdatesChannel": "stable",
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -85,7 +153,7 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "tui": "fullscreen",
-  "fileCheckpointingEnabled": false,
+  "fileCheckpointingEnabled": true,
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
@@ -96,6 +164,8 @@
       "Bash(git push *)",
       "Bash(git rebase *)",
       "Bash(git reset *)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore *)",
       "Bash(rm *)",
       "Bash(ssh *)",
       "Read(~/.claude/**)"
@@ -107,9 +177,13 @@
       "Bash(git stash drop *)",
       "Bash(kill -9 *)",
       "Bash(pkill *)",
-      "Bash(rm -fr:*)",
-      "Bash(rm -rf:*)",
+      "Bash(rm -fr *)",
+      "Bash(rm -rf *)",
       "Bash(sudo *)",
+      "Edit(//etc/**)",
+      "Edit(~/.claude/settings.json)",
+      "Edit(~/.claude/statusline.sh)",
+      "Edit(.claude/settings*.json)",
       "Read(~/.aws/**)",
       "Read(~/.azure/**)",
       "Read(~/.config/gh/**)",
@@ -125,8 +199,7 @@
       "Read(**/*.pfx)",
       "Read(**/credentials.json)",
       "Read(**/secrets/**)",
-      "Read(**/service-account*.json)",
-      "Edit(//etc/**)"
+      "Read(**/service-account*.json)"
     ],
     "defaultMode": "auto",
     "disableBypassPermissionsMode": "disable"
@@ -143,6 +216,5 @@
         ]
       }
     ]
-  },
-  "cleanupPeriodDays": 876000
+  }
 }
