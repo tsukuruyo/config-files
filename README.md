@@ -47,7 +47,7 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `scripts/bootstrap.sh` | Homebrew・mise・Orca（開発Macだけ）を入れ、`mise/` を `~/.config/mise` にリンクする |
 | `scripts/install-skills.sh` | Claude CodeとCodexのskillsを、skills CLI（`pnpx skills add`）で入れ直す。`make skills` で実行する |
 | `mise/config.toml` | すべてのMacで共通の設定。店のMacにも入れるもの（シェル・git・Ghostty・macOSの設定・Chromeなどのアプリ）だけ |
-| `mise/config.dev.toml` | 私物Macと仕事Macで共通の、開発用の設定（言語・Docker・VS Code・Claude CodeとCodexなど）。店のMacでは読まない |
+| `mise/config.dev.toml` | 私物Macと仕事Macで共通の、開発用の設定（言語・OrbStack・VS Code・Claude CodeとCodexなど）。店のMacでは読まない |
 | `mise/config.personal.toml` | 私物Macだけの設定 |
 | `mise/config.work.toml` | 仕事Macだけの設定。公開リポジトリなので社内ツールの名前などは書かない |
 | `mise/config.shop.toml` | 店のMacだけの設定 |
