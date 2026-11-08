@@ -81,6 +81,7 @@
       "docker images *",
       "gh *",
       "git fetch *",
+      "git merge *",
       "git pull *",
       "git push *"
     ],
@@ -161,6 +162,7 @@
     "ask": [
       "Bash(brew install *)",
       "Bash(gh pr create *)",
+      "Bash(git merge *)",
       "Bash(git push *)",
       "Bash(git rebase *)",
       "Bash(git reset *)",
