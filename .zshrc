@@ -1,12 +1,6 @@
 # 再読み込み (. ~/.zshrc) で PATH が重複して伸びないようにする
 typeset -U path PATH
 
-# --------------------------------------------------------------------------------
-# Homebrew
-# --------------------------------------------------------------------------------
-if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
 # brew upgrade は自分で実行する。brew install のついでに更新させない
 export HOMEBREW_NO_INSTALL_UPGRADE=1
 
