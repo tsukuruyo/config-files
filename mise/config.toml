@@ -49,6 +49,7 @@ adopt = true
 [dotfiles]
 "~/.gitconfig" = { source = "~/development/config-files/.gitconfig" }
 "~/.config/git/ignore" = { source = "~/development/config-files/git/ignore" }
+"~/.zprofile" = { source = "~/development/config-files/.zprofile" }
 "~/.zshrc" = { source = "~/development/config-files/.zshrc" }
 "~/.config/sheldon/plugins.toml" = { source = "~/development/config-files/sheldon/plugins.toml" }
 "~/.config/starship.toml" = { source = "~/development/config-files/starship/starship.toml" }
