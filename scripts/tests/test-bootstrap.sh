@@ -143,7 +143,7 @@ for pkg in brew:{fzf,gh,git,git-delta,mas,pam-reattach,ripgrep,sheldon,starship}
 done
 # The dev tools, for the personal and work Macs only.
 for pkg in brew:{ghq,git-filter-repo,git-lfs,gitleaks,jq,just,lazygit,shellcheck,sops} \
-  brew-cask:{claude,chatgpt,arc,visual-studio-code,docker-desktop} \
+  brew-cask:{claude,chatgpt,arc,visual-studio-code,orbstack} \
   brew-cask:{notion,linear,pearcleaner,sequel-ace} \
   brew-cask:{tailscale-app,ngrok,libreoffice,google-gemini} \
   mas:{497799835,937984704,1452453066,1532419400,457622435,1342896380}; do
