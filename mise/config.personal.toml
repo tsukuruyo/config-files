@@ -3,7 +3,7 @@
 # mise installs .NET with Microsoft's dotnet-install script into one root shared by
 # every SDK version listed, and sets DOTNET_ROOT and PATH for it.
 [tools]
-dotnet = ["10"]
+dotnet = "10"
 
 [bootstrap.packages]
 # Apps
