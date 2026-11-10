@@ -2,5 +2,6 @@
 .DS_Store
 *.sw[po]
 
-**/.claude/settings.local.json
 **/.claude/.cc-writes/
+**/.claude/settings.local.json
+**/.claude/worktrees/
