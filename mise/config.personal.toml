@@ -21,6 +21,7 @@ dotnet = "10"
 "brew-cask:obsidian" = "latest"
 # Runs a .pkg installer, which may ask for an admin password
 "brew-cask:temurin" = "latest"
+"brew-cask:unity-cli" = "latest"
 "brew-cask:unity-hub" = "latest"
 
 # App Store
