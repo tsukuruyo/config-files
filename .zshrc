@@ -167,13 +167,6 @@ export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-t
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # --------------------------------------------------------------------------------
-# Unity CLI
-# --------------------------------------------------------------------------------
-if [[ -f "${HOME}/.unity/env" ]]; then
-  . "${HOME}/.unity/env"
-fi
-
-# --------------------------------------------------------------------------------
 # Google cloud SDK
 # --------------------------------------------------------------------------------
 # The next line updates PATH for the Google Cloud SDK.

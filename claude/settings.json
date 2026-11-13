@@ -5,6 +5,7 @@
     "ENABLE_TOOL_SEARCH": "1",
     "CLAUDE_CODE_SCROLL_SPEED": "5"
   },
+  "language": "Japanese",
   "cleanupPeriodDays": 876000,
   "disableSkillShellExecution": true,
   "statusLine": {
@@ -24,7 +25,8 @@
     "superpowers-developing-for-claude-code@superpowers-marketplace": false,
     "security-guidance@claude-plugins-official": true,
     "ponytail@ponytail": true,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": false
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false,
+    "unity@unity-agent-plugin": true
   },
   "extraKnownMarketplaces": {
     "knowledge-work-plugins": {
@@ -62,13 +64,18 @@
         "source": "github",
         "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
       }
+    },
+    "unity-agent-plugin": {
+      "source": {
+        "source": "github",
+        "repo": "Unity-Technologies/unity-agent-plugin"
+      }
     }
   },
-  "language": "Japanese",
   "sandbox": {
     "enabled": true,
-    "allowUnsandboxedCommands": false,
     "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
     "failIfUnavailable": true,
     "network": {
       "allowLocalBinding": true
