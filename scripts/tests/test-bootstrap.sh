@@ -355,8 +355,11 @@ assert "Bash(git push *)" in s["permissions"].get("ask", []), "git push does not
 assert not any("git push" in r for r in s["permissions"]["deny"]), "git push is denied outright"
 # ask replaces each Mac's list wholesale on merge, so every rule the user asks on lives here.
 for rule in ["Bash(brew install *)", "Bash(gh pr create *)", "Bash(git rebase *)", "Bash(git reset *)",
-             "Bash(rm *)", "Bash(ssh *)", "Read(~/.claude/**)"]:
+             "Bash(rm *)", "Bash(ssh *)"]:
     assert rule in s["permissions"]["ask"], f"{rule} does not ask first"
+# Claude Code saves long tool output under ~/.claude/projects and reads it back; ask beats
+# allow, so asking on all of ~/.claude would ask on every one of those reads.
+assert "Read(~/.claude/**)" not in s["permissions"]["ask"], "reading saved tool output asks every time"
 deny = s["permissions"]["deny"]
 # Bash rules match each subcommand on its own and redirects go to file rules, so a rule
 # with a pipe or starting with > never matches; argument patterns are easy to sidestep.
