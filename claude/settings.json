@@ -179,7 +179,9 @@
       "Bash(git stash *)",
       "Bash(git restore *)",
       "Bash(rm *)",
-      "Bash(ssh *)"
+      "Bash(ssh *)",
+      "Read(~/.claude/jobs/**)",
+      "Read(~/.claude/projects/**)"
     ],
     "deny": [
       "Bash(chmod 777 *)",
