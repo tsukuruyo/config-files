@@ -146,7 +146,7 @@
       "effortLevel": "high"
     }
   },
-  "autoUpdatesChannel": "stable",
+  "autoUpdatesChannel": "latest",
   "voice": {
     "enabled": true,
     "mode": "hold"
