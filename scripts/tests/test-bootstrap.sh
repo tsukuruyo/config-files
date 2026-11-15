@@ -155,8 +155,8 @@ grep -q '^\[tools\]' "$repo/mise/config.toml" && fail "mise/config.toml installs
 for tool in node python ruby pnpm; do
   grep -q "^$tool = " "$repo/mise/config.dev.toml" || fail "mise/config.dev.toml does not install $tool"
 done
-# The shop Mac adds LINE, as the personal one does: the two envs never load together.
-declared config.shop.toml mas:539883307 || fail "mise/config.shop.toml does not declare LINE"
+# LINE is for the personal Mac only, not the shop one.
+declared config.shop.toml mas:539883307 && fail "mise/config.shop.toml declares LINE"
 # Dotfiles for the dev tools go with them; the shell, git and the terminal are for every Mac.
 for key in .claude/ .codex/ Code/User/ .npmrc .yarnrc.yml pnpm/config.yaml lazygit/config.yml; do
   grep -F -- "$key" "$repo/mise/config.toml" | grep -q '^"~' && fail "mise/config.toml links $key on the shop Mac too"
