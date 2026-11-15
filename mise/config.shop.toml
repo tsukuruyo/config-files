@@ -1,2 +1,38 @@
 # Loaded on top of config.toml when miserc.local.toml sets env = ["shop"]: the Mac at the shop.
 # It does not load config.dev.toml, so only config.toml and this file apply there.
+
+[bootstrap.packages]
+# Basic tools
+"brew:ghq" = "latest"
+"brew:git-filter-repo" = "latest"
+"brew:gitleaks" = "latest"
+# claude/statusline.sh reads Claude Code's status JSON with it
+"brew:jq" = "latest"
+"brew:just" = "latest"
+"brew:lazygit" = "latest"
+"brew:shellcheck" = "latest"
+# Apps
+"brew-cask:chatgpt" = "latest"
+"brew-cask:claude" = "latest"
+"brew-cask:google-drive" = "latest"
+"brew-cask:orbstack" = "latest"
+"brew-cask:visual-studio-code" = "latest"
+"brew-cask:tailscale-app" = "latest"
+
+[dotfiles]
+"~/Library/Application Support/lazygit/config.yml" = { source = "~/development/config-files/lazygit/config.yml" }
+# The same 7-day release age as config.toml's [settings] minimum_release_age, for npm/pnpm and yarn
+"~/.npmrc" = { source = "~/development/config-files/.npmrc" }
+"~/.yarnrc.yml" = { source = "~/development/config-files/.yarnrc.yml" }
+"~/Library/Preferences/pnpm/config.yaml" = { source = "~/development/config-files/pnpm/config.yaml" }
+"~/Library/Application Support/Code/User/settings.json" = { source = "~/development/config-files/vscode/settings.json" }
+"~/Library/Application Support/Code/User/keybindings.json" = { source = "~/development/config-files/vscode/keybindings.json" }
+"~/.claude/CLAUDE.md" = { source = "~/development/config-files/claude/CLAUDE.md" }
+"~/.claude/statusline.sh" = { source = "~/development/config-files/claude/statusline.sh" }
+"~/.claude/keybindings.json" = { source = "~/development/config-files/claude/keybindings.json" }
+# Claude Code and Orca rewrite settings.json: merge in the shared keys, keep the rest
+"~/.claude/settings.json/shared" = { source = "~/development/config-files/claude/settings.json", merge = true }
+"~/.codex/AGENTS.md" = { source = "~/development/config-files/codex/AGENTS.md" }
+"~/.codex/keybindings.json" = { source = "~/development/config-files/codex/keybindings.json" }
+# Codex writes paths and MCP servers into config.toml: merge in [desktop] only
+"~/.codex/config.toml/shared" = { source = "~/development/config-files/codex/config.toml", merge = true }
