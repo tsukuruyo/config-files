@@ -35,9 +35,8 @@ adopt = true
 "brew-cask:google-chrome" = "latest"
 "brew-cask:keka" = "latest"
 "brew-cask:raycast" = "latest"
-# These run a .pkg installer, which may ask for an admin password
+# Runs a .pkg installer, which may ask for an admin password
 "brew-cask:google-japanese-ime" = "latest"
-"brew-cask:zoom" = "latest"
 
 # Font used by ghostty/config and vscode/settings.json. Not font-biz-udgothic: that cask clones all
 # of google/fonts (several GB) and fails partway.
