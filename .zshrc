@@ -30,8 +30,7 @@ autoload -Uz colors
 colors
 
 # aliases
-alias claude='\claude agents --cwd .'
-alias c='claude'
+alias c='claude agents --cwd .'
 alias cx='\codex'
 alias d='\docker'
 alias g='\git'
@@ -185,6 +184,10 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 # --------------------------------------------------------------------------------
 # Unity CLI
 # --------------------------------------------------------------------------------
+if [ -f "${HOME}/.unity/env" ]; then
+  . "${HOME}/.unity/env"
+fi
+
 export UNITY_NO_CLI_INVOKED_TELEMETRY=1
 export UNITY_NO_CRASH_REPORT=1
 export UNITY_NO_UPDATE_CHECK=1
