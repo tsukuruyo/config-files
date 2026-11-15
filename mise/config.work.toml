@@ -5,3 +5,5 @@
 "brew-cask:cyberduck" = "latest"
 "brew-cask:microsoft-teams" = "latest"
 "brew-cask:slack" = "latest"
+# Runs a .pkg installer, which may ask for an admin password
+"brew-cask:zoom" = "latest"

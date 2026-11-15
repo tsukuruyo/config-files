@@ -138,7 +138,7 @@ done
 # Apps for every Mac, the shop one included: the shell, git, the terminal and a few apps.
 declared() { grep -qE "^\"$2\" = \"latest\"" "$repo/mise/$1" 2>/dev/null; }
 for pkg in brew:{fzf,gh,git,git-delta,mas,pam-reattach,ripgrep,sheldon,starship} \
-  brew-cask:{bitwarden,ghostty,google-chrome,google-japanese-ime,keka,raycast,zoom,font-udev-gothic-nf}; do
+  brew-cask:{bitwarden,ghostty,google-chrome,google-japanese-ime,keka,raycast,font-udev-gothic-nf}; do
   declared config.toml "$pkg" || fail "mise/config.toml does not declare $pkg"
 done
 # The dev tools, for the personal and work Macs only.
@@ -157,6 +157,13 @@ for tool in node python ruby pnpm; do
 done
 # LINE is for the personal Mac only, not the shop one.
 declared config.shop.toml mas:539883307 && fail "mise/config.shop.toml declares LINE"
+# Zoom is for the personal and work Macs, but it is no dev tool.
+for f in config.personal.toml config.work.toml; do
+  declared "$f" brew-cask:zoom || fail "mise/$f does not declare brew-cask:zoom"
+done
+for f in config.toml config.dev.toml config.shop.toml; do
+  declared "$f" brew-cask:zoom && fail "mise/$f declares brew-cask:zoom"
+done
 # Dotfiles for the dev tools go with them; the shell, git and the terminal are for every Mac.
 for key in .claude/ .codex/ Code/User/ .npmrc .yarnrc.yml pnpm/config.yaml lazygit/config.yml; do
   grep -F -- "$key" "$repo/mise/config.toml" | grep -q '^"~' && fail "mise/config.toml links $key on the shop Mac too"

@@ -23,6 +23,8 @@ dotnet = "10"
 "brew-cask:temurin" = "latest"
 "brew-cask:unity-cli" = "latest"
 "brew-cask:unity-hub" = "latest"
+# Runs a .pkg installer, which may ask for an admin password
+"brew-cask:zoom" = "latest"
 
 # App Store
 "mas:1380563956" = "latest" # Dictionaries
