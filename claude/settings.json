@@ -14,18 +14,8 @@
     "padding": 2
   },
   "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": false,
-    "gopls-lsp@claude-plugins-official": true,
-    "github@claude-plugins-official": false,
-    "rust-analyzer-lsp@claude-plugins-official": false,
-    "code-simplifier@claude-plugins-official": false,
-    "frontend-design@claude-plugins-official": false,
-    "superpowers@superpowers-marketplace": true,
-    "episodic-memory@superpowers-marketplace": true,
-    "superpowers-developing-for-claude-code@superpowers-marketplace": false,
     "security-guidance@claude-plugins-official": true,
     "ponytail@ponytail": true,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": false,
     "unity@unity-agent-plugin": true
   },
   "extraKnownMarketplaces": {
@@ -47,22 +37,10 @@
         "url": "https://github.com/anthropics/claude-plugins-official.git"
       }
     },
-    "superpowers-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "obra/superpowers-marketplace"
-      }
-    },
     "ponytail": {
       "source": {
         "source": "github",
         "repo": "DietrichGebert/ponytail"
-      }
-    },
-    "ui-ux-pro-max-skill": {
-      "source": {
-        "source": "github",
-        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
       }
     },
     "unity-agent-plugin": {
@@ -86,11 +64,14 @@
       "docker ps *",
       "docker logs *",
       "docker images *",
-      "gh *",
+      "dotnet format *",
+      "gh pr create *",
       "git fetch *",
       "git merge *",
       "git pull *",
-      "git push *"
+      "git push *",
+      "git switch *",
+      "unity test *"
     ],
     "credentials": {
       "files": [
@@ -179,9 +160,7 @@
       "Bash(git stash *)",
       "Bash(git restore *)",
       "Bash(rm *)",
-      "Bash(ssh *)",
-      "Read(~/.claude/jobs/**)",
-      "Read(~/.claude/projects/**)"
+      "Bash(ssh *)"
     ],
     "deny": [
       "Bash(chmod 777 *)",
