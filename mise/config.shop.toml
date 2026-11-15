@@ -6,6 +6,8 @@
 "brew:ghq" = "latest"
 "brew:git-filter-repo" = "latest"
 "brew:gitleaks" = "latest"
+# Runs a .pkg installer, which may ask for an admin password
+"brew-cask:google-drive" = "latest"
 # claude/statusline.sh reads Claude Code's status JSON with it
 "brew:jq" = "latest"
 "brew:just" = "latest"
