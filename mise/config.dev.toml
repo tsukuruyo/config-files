@@ -36,6 +36,8 @@ pnpm = "12"
 "brew-cask:visual-studio-code" = "latest"
 # Runs a .pkg installer, which may ask for an admin password
 "brew-cask:tailscale-app" = "latest"
+# Runs a .pkg installer, which may ask for an admin password
+"brew-cask:temurin" = "latest"
 
 # App Store
 "mas:497799835" = "latest" # Xcode
