@@ -1,0 +1,70 @@
+# Mirrors permissions in ~/.claude/settings.json so Claude Code and Codex
+# stop at the same commands.
+
+# permissions.ask
+prefix_rule(
+    pattern = ["brew", "install"],
+    decision = "prompt",
+    justification = "Installing packages changes the machine",
+    match = ["brew install jq"],
+)
+
+prefix_rule(
+    pattern = ["gh", "pr"],
+    decision = "prompt",
+    justification = "gh pr can write to GitHub",
+    match = ["gh pr create --fill", "gh pr view 1"],
+)
+
+prefix_rule(
+    pattern = ["git", ["branch", "checkout", "clean", "merge", "push", "rebase", "reset", "stash", "restore"]],
+    decision = "prompt",
+    justification = "This git command can rewrite or discard work",
+    match = ["git push origin main", "git reset --hard", "git stash pop"],
+    not_match = ["git status", "git log --oneline"],
+)
+
+prefix_rule(
+    pattern = ["rm"],
+    decision = "prompt",
+    justification = "Deleting files",
+    match = ["rm -rf build"],
+)
+
+prefix_rule(
+    pattern = ["ssh"],
+    decision = "prompt",
+    justification = "Connecting to another machine",
+    match = ["ssh example.com"],
+)
+
+# permissions.deny
+prefix_rule(
+    pattern = ["chmod", "777"],
+    decision = "forbidden",
+    justification = "World-writable permissions",
+    match = ["chmod 777 file"],
+    not_match = ["chmod 755 file"],
+)
+
+prefix_rule(
+    pattern = ["kill", "-9"],
+    decision = "forbidden",
+    justification = "Force-killing processes",
+    match = ["kill -9 123"],
+)
+
+prefix_rule(
+    pattern = [["kubectl", "pkill", "sudo"]],
+    decision = "forbidden",
+    justification = "Not allowed for agents",
+    match = ["kubectl get pods", "pkill node", "sudo ls"],
+)
+
+# permissions.allow (runs outside the sandbox without prompting)
+prefix_rule(
+    pattern = ["unity", "test"],
+    decision = "allow",
+    justification = "Unity tests need to run outside the sandbox",
+    match = ["unity test --platform editmode"],
+)
