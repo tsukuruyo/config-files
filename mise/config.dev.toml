@@ -62,5 +62,6 @@ pnpm = "12"
 "~/.claude/settings.json/shared" = { source = "~/development/config-files/claude/settings.json", merge = true }
 "~/.codex/AGENTS.md" = { source = "~/development/config-files/codex/AGENTS.md" }
 "~/.codex/keybindings.json" = { source = "~/development/config-files/codex/keybindings.json" }
-# Codex writes paths and MCP servers into config.toml: merge in [desktop] only
+"~/.codex/rules/user.rules" = { source = "~/development/config-files/codex/user.rules" }
+# Codex writes paths and MCP servers into config.toml: merge in the shared keys only
 "~/.codex/config.toml/shared" = { source = "~/development/config-files/codex/config.toml", merge = true }

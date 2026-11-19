@@ -2,6 +2,39 @@
 # that file itself (notify, plugins, MCP servers with paths into the app), so
 # only the settings chosen by hand are shared here.
 
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+default_permissions = "guarded-workspace"
+
+[shell_environment_policy]
+exclude = ["GITHUB_TOKEN", "GH_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN"]
+
+# The same credential read denies as claude/settings.json
+[permissions.guarded-workspace]
+extends = ":workspace"
+
+[permissions.guarded-workspace.filesystem]
+"~/.ssh" = "deny"
+"~/.aws" = "deny"
+"~/.azure" = "deny"
+"~/.kube" = "deny"
+"~/.gnupg" = "deny"
+"~/.git-credentials" = "deny"
+"~/.config/gh" = "deny"
+
+[permissions.guarded-workspace.filesystem.":workspace_roots"]
+"**/.env" = "deny"
+"**/*.env" = "deny"
+"**/.env.*" = "deny"
+"**/*.key" = "deny"
+"**/*.p12" = "deny"
+"**/*.pem" = "deny"
+"**/*.pfx" = "deny"
+"**/credentials.json" = "deny"
+"**/secrets/**" = "deny"
+"**/service-account*.json" = "deny"
+
 [desktop]
 followUpQueueMode = "steer"
 conversationDetailMode = "STEPS_PROSE"
