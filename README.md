@@ -71,7 +71,8 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 | `claude/settings.json` | Claude Codeの設定のうち、すべてのMacで共通のキーだけ。Claude CodeやOrcaが書き換えるので、`~/.claude/settings.json` はリンクにせず、mise bootstrapがこのキーだけをマージする。権限の `allow`（その場で許可したもの）とOrcaのhooksは、Macごとのファイルに残す。`git push` は `ask` に入れ、Claude Codeが実行するたびに確認する |
 | `codex/AGENTS.md` | Claude CodeとCodexで共通のグローバルな指示。`~/.codex/AGENTS.md` にリンクする。特定のツールにしかない機能の話は書かない |
 | `codex/keybindings.json` | Codexのキーの割り当て。`~/.codex/keybindings.json` にリンクする |
-| `codex/config.toml` | Codexの設定のうち `[desktop]` だけ。Codexがnotify・プラグイン・MCPサーバー（アプリの中のパス入り）を書くので、`~/.codex/config.toml` はリンクにせずマージする |
+| `codex/config.toml` | Codexの設定のうち、手で選んだキーだけ（推論の強さ・承認の方針・コマンドに渡さない環境変数・読み取りを禁止する場所・`[desktop]`）。Codexがnotify・プラグイン・MCPサーバー（アプリの中のパス入り）を書くので、`~/.codex/config.toml` はリンクにせずマージする。読み取りの禁止は `claude/settings.json` の `Read` のdenyと同じ場所にする |
+| `codex/user.rules` | Codexがコマンドを実行する前の確認・禁止。`~/.codex/rules/user.rules` にリンクする。`claude/settings.json` の `permissions` の `ask`・`deny`・`allow` のうちコマンドのものと同じにする。`codex execpolicy check --rules codex/user.rules -- <コマンド>` で判定を確かめられる |
 | `AGENTS.md` / `CLAUDE.md` | このリポジトリで作業するときの指示。中身は `AGENTS.md` に書き、`CLAUDE.md` は `@AGENTS.md` で読み込むだけ |
 
 ## AIの設定
@@ -82,7 +83,8 @@ Macのdotfiles・パッケージ・設定を、[mise bootstrap](https://mise.jdx
 - Claude Codeの設定は `claude/` に置く。リポジトリ直下の `.claude/` は、このリポジトリ自体のプロジェクト設定として読まれてしまうため使わない
 - `~/.claude/settings.json` の共通のキーを変えたら `claude/settings.json` にも反映する。マージは `claude/settings.json` にあるキーだけを見るので、そこから消したキーは各Macのファイルに残る
 - 配列（`permissions.deny` や `permissions.ask` など）はマージせず、`claude/settings.json` の内容で丸ごと置き換わる
-- `codex/config.toml` も同じくマージする。Codexの画面で `[desktop]` の設定を変えたら、`codex/config.toml` にも反映する
+- `codex/config.toml` も同じくマージする。Codexの画面で `codex/config.toml` にあるキーを変えたら、`codex/config.toml` にも反映する。反映しないと、次のmise bootstrapでリポジトリの値に戻る
+- `claude/settings.json` の権限を変えたら、Codexの `codex/user.rules`（コマンド）と `codex/config.toml`（読み取りの禁止・環境変数）にも反映する
 - Orcaはアプリ本体だけを、`scripts/bootstrap.sh` がstablyaiのtapのcask（`brew install --cask stablyai/orca/orca`）で入れる。miseの宣言にしないのは、外部のtapのcaskをmiseが読むにはRuby 3以上が要り、新しいMacにはないため（brewは同梱のRubyを使う）。手で入れたOrcaがあれば何もしない。Orcaは自分で更新する。設定はアプリの中（IndexedDBなど）にあり、ファイルとしては管理できない。`~/.orca/agent-hooks/` やClaude Codeのhooksは、Orcaが自分で入れる
 
 ## macOSの設定

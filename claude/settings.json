@@ -65,7 +65,7 @@
       "docker logs *",
       "docker images *",
       "dotnet format *",
-      "gh pr create *",
+      "gh pr *",
       "git fetch *",
       "git merge *",
       "git pull *",
@@ -149,7 +149,7 @@
   "permissions": {
     "ask": [
       "Bash(brew install *)",
-      "Bash(gh pr create *)",
+      "Bash(gh pr *)",
       "Bash(git branch *)",
       "Bash(git checkout *)",
       "Bash(git clean *)",
