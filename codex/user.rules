@@ -1,27 +1,38 @@
-# Mirrors permissions in ~/.claude/settings.json so Claude Code and Codex
-# stop at the same commands.
+# Command rules for Codex, all projects.
+#
+# The permission profiles deny reading credentials, and while a "deny" entry is
+# active Codex keeps every shell command inside the sandbox. So:
+#   prompt    = the reviewer decides first (approvals_reviewer = "auto_review")
+#   forbidden = never runs; the justification tells the agent what to do instead
+#   allow     = runs without asking, still inside the sandbox
+# The strictest matching rule wins. A project adds its own rules in
+# <project>/.codex/rules/.
+#
+# Test: codex execpolicy check --pretty --rules ~/.codex/rules/user.rules -- <command>
 
-# permissions.ask
+# Reviewed first
 prefix_rule(
-    pattern = ["brew", "install"],
+    pattern = ["git", "branch", ["-D", "-d"]],
     decision = "prompt",
-    justification = "Installing packages changes the machine",
-    match = ["brew install jq"],
+    justification = "Deletes a branch",
+    match = ["git branch -D feature"],
+    not_match = ["git branch -a"],
 )
 
 prefix_rule(
-    pattern = ["gh", "pr"],
-    decision = "prompt",
-    justification = "gh pr can write to GitHub",
-    match = ["gh pr create --fill", "gh pr view 1"],
-)
-
-prefix_rule(
-    pattern = ["git", ["branch", "checkout", "clean", "merge", "push", "rebase", "reset", "stash", "restore"]],
+    pattern = ["git", ["checkout", "clean", "merge", "rebase", "reset", "restore"]],
     decision = "prompt",
     justification = "This git command can rewrite or discard work",
-    match = ["git push origin main", "git reset --hard", "git stash pop"],
+    match = ["git reset --hard", "git clean -fd"],
     not_match = ["git status", "git log --oneline"],
+)
+
+prefix_rule(
+    pattern = ["git", "stash", ["clear", "drop"]],
+    decision = "prompt",
+    justification = "Discards stashed work",
+    match = ["git stash drop"],
+    not_match = ["git stash list"],
 )
 
 prefix_rule(
@@ -31,20 +42,35 @@ prefix_rule(
     match = ["rm -rf build"],
 )
 
+# Never runs
 prefix_rule(
-    pattern = ["ssh"],
-    decision = "prompt",
-    justification = "Connecting to another machine",
-    match = ["ssh example.com"],
+    pattern = ["brew"],
+    decision = "forbidden",
+    justification = "Installing tools is left to the user. Report the package that is needed instead",
+    match = ["brew install jq"],
 )
 
-# permissions.deny
 prefix_rule(
     pattern = ["chmod", "777"],
     decision = "forbidden",
     justification = "World-writable permissions",
     match = ["chmod 777 file"],
     not_match = ["chmod 755 file"],
+)
+
+prefix_rule(
+    pattern = ["gh"],
+    decision = "forbidden",
+    justification = "GitHub cannot be reached from the Codex sandbox: it has no external network and cannot read credentials. Report the gh command for the user to run instead",
+    match = ["gh pr view 1", "gh pr create --fill", "gh auth token"],
+)
+
+prefix_rule(
+    pattern = ["git", ["clone", "fetch", "ls-remote", "pull", "push"]],
+    decision = "forbidden",
+    justification = "Remote git operations cannot work in the Codex sandbox: it has no external network and cannot read credentials. Report the git command for the user to run instead",
+    match = ["git push origin main", "git fetch --all", "git pull --rebase"],
+    not_match = ["git status", "git commit -m message"],
 )
 
 prefix_rule(
@@ -55,16 +81,8 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = [["kubectl", "pkill", "sudo"]],
+    pattern = [["kubectl", "pkill", "ssh", "sudo"]],
     decision = "forbidden",
-    justification = "Not allowed for agents",
-    match = ["kubectl get pods", "pkill node", "sudo ls"],
-)
-
-# permissions.allow (runs outside the sandbox without prompting)
-prefix_rule(
-    pattern = ["unity", "test"],
-    decision = "allow",
-    justification = "Unity tests need to run outside the sandbox",
-    match = ["unity test --platform editmode"],
+    justification = "Not allowed for agents. Report the command for the user to run instead",
+    match = ["kubectl get pods", "pkill node", "ssh example.com", "sudo ls"],
 )

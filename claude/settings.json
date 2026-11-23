@@ -3,11 +3,14 @@
   "env": {
     "CLAUDE_CODE_NEW_INIT": "1",
     "ENABLE_TOOL_SEARCH": "1",
-    "CLAUDE_CODE_SCROLL_SPEED": "5"
+    "CLAUDE_CODE_SCROLL_SPEED": "3",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1"
   },
   "language": "Japanese",
   "cleanupPeriodDays": 876000,
   "disableSkillShellExecution": true,
+  "enableAllProjectMcpServers": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -56,29 +59,83 @@
     "allowUnsandboxedCommands": false,
     "failIfUnavailable": true,
     "network": {
-      "allowLocalBinding": true
+      "allowLocalBinding": false
     },
     "excludedCommands": [
       "docker build *",
       "docker compose *",
-      "docker ps *",
-      "docker logs *",
       "docker images *",
+      "docker logs *",
+      "docker ps *",
       "dotnet format *",
-      "gh pr *",
+      "gh issue close *",
+      "gh issue comment *",
+      "gh issue create *",
+      "gh issue edit *",
+      "gh issue list *",
+      "gh issue view *",
+      "gh pr checks *",
+      "gh pr close *",
+      "gh pr comment *",
+      "gh pr create *",
+      "gh pr diff *",
+      "gh pr edit *",
+      "gh pr list *",
+      "gh pr merge *",
+      "gh pr review *",
+      "gh pr status *",
+      "gh pr view *",
+      "gh repo view *",
+      "gh run list *",
+      "gh run view *",
+      "gh run watch *",
+      "gh status *",
+      "git branch *",
+      "git checkout *",
+      "git clean *",
+      "git clone *",
       "git fetch *",
+      "git ls-remote *",
       "git merge *",
       "git pull *",
       "git push *",
+      "git rebase *",
+      "git stash clear *",
+      "git stash drop *",
+      "git submodule update *",
       "git switch *",
-      "unity test *"
+      "orca agent installed *",
+      "orca agent launch *",
+      "orca agent list *",
+      "orca agent read *",
+      "orca agent show *",
+      "orca orchestration *",
+      "orca ports *",
+      "orca repo add *",
+      "orca repo list *",
+      "orca repo search-refs *",
+      "orca repo set *",
+      "orca repo set-base-ref *",
+      "orca repo show *",
+      "orca status *",
+      "orca terminal list *",
+      "orca terminal read *",
+      "orca terminal create *",
+      "orca terminal send *",
+      "orca terminal show *",
+      "orca terminal split *",
+      "orca terminal wait *",
+      "orca worktree add *",
+      "orca worktree create *",
+      "orca worktree current *",
+      "orca worktree list *",
+      "orca worktree ps *",
+      "orca worktree set *",
+      "orca worktree show *",
+      "unity *"
     ],
     "credentials": {
       "files": [
-        {
-          "path": "~/.ssh",
-          "mode": "deny"
-        },
         {
           "path": "~/.aws",
           "mode": "deny"
@@ -88,11 +145,15 @@
           "mode": "deny"
         },
         {
-          "path": "~/.kube",
+          "path": "~/.config/gh",
           "mode": "deny"
         },
         {
-          "path": "~/.gnupg",
+          "path": "~/.docker/config.json",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.gem/credentials",
           "mode": "deny"
         },
         {
@@ -100,19 +161,35 @@
           "mode": "deny"
         },
         {
-          "path": "~/.config/gh",
+          "path": "~/.gnupg",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.kube",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.netrc",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.npmrc",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.pypirc",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.ssh",
+          "mode": "deny"
+        },
+        {
+          "path": "~/Library/Keychains",
           "mode": "deny"
         }
       ],
       "envVars": [
-        {
-          "name": "GITHUB_TOKEN",
-          "mode": "deny"
-        },
-        {
-          "name": "GH_TOKEN",
-          "mode": "deny"
-        },
         {
           "name": "AWS_ACCESS_KEY_ID",
           "mode": "deny"
@@ -123,6 +200,26 @@
         },
         {
           "name": "AWS_SESSION_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "GH_ENTERPRISE_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "GH_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "GITHUB_ENTERPRISE_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "GITHUB_TOKEN",
+          "mode": "deny"
+        },
+        {
+          "name": "NPM_TOKEN",
           "mode": "deny"
         }
       ]
@@ -147,50 +244,159 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "permissions": {
+    "defaultMode": "auto",
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr status *)",
+      "Bash(gh pr view *)",
+      "Bash(gh repo view *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)",
+      "Bash(gh run watch *)",
+      "Bash(orca agent installed *)",
+      "Bash(orca agent launch *)",
+      "Bash(orca agent list *)",
+      "Bash(orca agent read *)",
+      "Bash(orca agent show *)",
+      "Bash(orca open *)",
+      "Bash(orca orchestration *)",
+      "Bash(orca ports *)",
+      "Bash(orca repo list *)",
+      "Bash(orca repo search-refs *)",
+      "Bash(orca repo show *)",
+      "Bash(orca status *)",
+      "Bash(orca terminal list *)",
+      "Bash(orca terminal read *)",
+      "Bash(orca terminal show *)",
+      "Bash(orca terminal wait *)",
+      "Bash(orca worktree create *)",
+      "Bash(orca worktree current *)",
+      "Bash(orca worktree list *)",
+      "Bash(orca worktree ps *)",
+      "Bash(orca worktree show *)",
+      "Bash(unity command console get *)",
+      "Bash(unity command console status *)",
+      "Bash(unity command test run *)",
+      "Bash(unity command test status *)",
+      "Bash(unity recompile *)",
+      "Bash(unity status *)",
+      "Edit(~/.cos/reports/**)",
+      "Read(~/.cos/reports/**)"
+    ],
     "ask": [
-      "Bash(brew install *)",
-      "Bash(gh pr *)",
-      "Bash(git branch *)",
+      "Bash(docker compose down *)",
+      "Bash(gh api *)",
+      "Bash(gh issue close *)",
+      "Bash(gh issue comment *)",
+      "Bash(gh issue create *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh issue new *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr comment *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr new *)",
+      "Bash(gh pr review *)",
+      "Bash(gh release create *)",
+      "Bash(gh release delete *)",
+      "Bash(gh release edit *)",
+      "Bash(gh release new *)",
+      "Bash(gh release upload *)",
+      "Bash(gh workflow run *)",
+      "Bash(git branch -D *)",
+      "Bash(git branch -d *)",
       "Bash(git checkout *)",
       "Bash(git clean *)",
       "Bash(git merge *)",
       "Bash(git push *)",
       "Bash(git rebase *)",
       "Bash(git reset *)",
-      "Bash(git stash *)",
       "Bash(git restore *)",
-      "Bash(rm *)",
-      "Bash(ssh *)"
+      "Bash(git stash clear *)",
+      "Bash(git stash drop *)",
+      "Bash(orca repo add *)",
+      "Bash(orca repo set *)",
+      "Bash(orca repo set-base-ref *)",
+      "Bash(orca skills get *)",
+      "Bash(orca terminal close *)",
+      "Bash(orca terminal create *)",
+      "Bash(orca terminal send *)",
+      "Bash(orca terminal split *)",
+      "Bash(orca workspace cleanup run *)",
+      "Bash(orca worktree rm *)",
+      "Bash(orca worktree set *)",
+      "Bash(rm *)"
     ],
     "deny": [
+      "Bash(brew *)",
       "Bash(chmod 777 *)",
+      "Bash(gh alias *)",
+      "Bash(gh auth *)",
+      "Bash(gh config *)",
+      "Bash(gh copilot *)",
+      "Bash(gh ext *)",
+      "Bash(gh extension *)",
+      "Bash(gh extensions *)",
+      "Bash(gh gpg-key *)",
+      "Bash(gh repo delete *)",
+      "Bash(gh repo deploy-key *)",
+      "Bash(gh secret *)",
+      "Bash(gh skill *)",
+      "Bash(gh skills *)",
+      "Bash(gh ssh-key *)",
       "Bash(kill -9 *)",
       "Bash(kubectl *)",
+      "Bash(orca computer *)",
+      "Bash(orca eval *)",
+      "Bash(orca exec *)",
+      "Bash(orca plugin *)",
       "Bash(pkill *)",
+      "Bash(ssh *)",
       "Bash(sudo *)",
+      "Edit(.claude/settings*.json)",
       "Edit(//etc/**)",
+      "Edit(~/.bashrc)",
       "Edit(~/.claude/settings.json)",
       "Edit(~/.claude/statusline.sh)",
-      "Edit(.claude/settings*.json)",
-      "Read(~/.aws/**)",
-      "Read(~/.azure/**)",
-      "Read(~/.config/gh/**)",
-      "Read(~/.git-credentials)",
-      "Read(~/.gnupg/**)",
-      "Read(~/.kube/**)",
-      "Read(~/.ssh/**)",
-      "Read(*.env)",
-      "Read(.env.*)",
+      "Edit(~/.zprofile)",
+      "Edit(~/.zshenv)",
+      "Edit(~/.zshrc)",
+      "Read(!.env.example)",
+      "Read(!.env.sample)",
+      "Read(**/*.jks)",
       "Read(**/*.key)",
+      "Read(**/*.keystore)",
+      "Read(**/*.mobileprovision)",
       "Read(**/*.p12)",
+      "Read(**/*.p8)",
       "Read(**/*.pem)",
       "Read(**/*.pfx)",
       "Read(**/credentials.json)",
       "Read(**/secrets/**)",
-      "Read(**/service-account*.json)"
-    ],
-    "defaultMode": "auto",
-    "disableBypassPermissionsMode": "disable"
+      "Read(**/service-account*.json)",
+      "Read(*.env)",
+      "Read(.env.*)",
+      "Read(~/.aws/**)",
+      "Read(~/.azure/**)",
+      "Read(~/.codex/auth.json)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.gem/credentials)",
+      "Read(~/.git-credentials)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(~/.pypirc)",
+      "Read(~/.ssh/**)",
+      "Read(~/Library/Keychains/**)"
+    ]
   },
   "hooks": {
     "Notification": [

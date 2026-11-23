@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_NEW_INIT": "1",
+    "ENABLE_TOOL_SEARCH": "1",
+    "CLAUDE_CODE_SCROLL_SPEED": "5",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1"
+  },
+  "language": "Japanese",
+  "cleanupPeriodDays": 876000,
+  "disableSkillShellExecution": true,
+  "enableAllProjectMcpServers": false,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 2
+  },
+  "enabledPlugins": {
+    "security-guidance@claude-plugins-official": true,
+    "ponytail@ponytail": true,
+    "unity@unity-agent-plugin": true
+  },
+  "extraKnownMarketplaces": {
+    "knowledge-work-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/knowledge-work-plugins"
+      }
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/claude-plugins-official.git"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "unity-agent-plugin": {
+      "source": {
+        "source": "github",
+        "repo": "Unity-Technologies/unity-agent-plugin"
+      }
+    }
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "failIfUnavailable": true,
+    "network": {
+      "allowLocalBinding": false
+    },
+    "excludedCommands": [
+      "docker build *",
+      "docker compose *",
+      "docker images *",
+      "docker logs *",
+      "docker ps *",
+      "dotnet format *",
+      "gh *",
+      "git clone *",
+      "git fetch *",
+      "git ls-remote *",
+      "git merge *",
+      "git pull *",
+      "git push *",
+      "git submodule update *",
+      "git switch *",
+      "orca agent installed *",
+      "orca agent launch *",
+      "orca agent list *",
+      "orca agent read *",
+      "orca agent show *",
+      "orca orchestration send *",
+      "orca ports *",
+      "orca repo add *",
+      "orca repo list *",
+      "orca repo search-refs *",
+      "orca repo set *",
+      "orca repo set-base-ref *",
+      "orca repo show *",
+      "orca status *",
+      "orca terminal list *",
+      "orca terminal read *",
+      "orca terminal show *",
+      "orca worktree add *",
+      "orca worktree create *",
+      "orca worktree current *",
+      "orca worktree list *",
+      "orca worktree ps *",
+      "orca worktree set *",
+      "orca worktree show *",
+      "unity *"
+    ],
+    "credentials": {
+      "files": [
+        { "path": "~/.ssh", "mode": "deny" },
+        { "path": "~/.gnupg", "mode": "deny" },
+        { "path": "~/.aws", "mode": "deny" },
+        { "path": "~/.azure", "mode": "deny" },
+        { "path": "~/.kube", "mode": "deny" },
+        { "path": "~/.docker/config.json", "mode": "deny" },
+        { "path": "~/.npmrc", "mode": "deny" },
+        { "path": "~/.pypirc", "mode": "deny" },
+        { "path": "~/.gem/credentials", "mode": "deny" },
+        { "path": "~/.git-credentials", "mode": "deny" },
+        { "path": "~/.netrc", "mode": "deny" },
+        { "path": "~/.config/gh", "mode": "deny" },
+        { "path": "~/Library/Keychains", "mode": "deny" },
+        { "path": "~/Library/Preferences/shopify-cli-kit-nodejs", "mode": "deny" }
+      ],
+      "envVars": [
+        { "name": "GITHUB_TOKEN", "mode": "deny" },
+        { "name": "GH_TOKEN", "mode": "deny" },
+        { "name": "NPM_TOKEN", "mode": "deny" },
+        { "name": "AWS_ACCESS_KEY_ID", "mode": "deny" },
+        { "name": "AWS_SECRET_ACCESS_KEY", "mode": "deny" },
+        { "name": "AWS_SESSION_TOKEN", "mode": "deny" }
+      ]
+    }
+  },
+  "effortLevel": "high",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "autoUpdatesChannel": "latest",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "tui": "fullscreen",
+  "fileCheckpointingEnabled": true,
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "permissions": {
+    "allow": [
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr status *)",
+      "Bash(gh pr view *)",
+      "Bash(gh repo view *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)",
+      "Bash(orca agent installed *)",
+      "Bash(orca agent launch *)",
+      "Bash(orca agent list *)",
+      "Bash(orca agent read *)",
+      "Bash(orca agent show *)",
+      "Bash(orca open *)",
+      "Bash(orca orchestration *)",
+      "Bash(orca ports *)",
+      "Bash(orca repo list *)",
+      "Bash(orca repo search-refs *)",
+      "Bash(orca repo show *)",
+      "Bash(orca status *)",
+      "Bash(orca terminal create *)",
+      "Bash(orca terminal list *)",
+      "Bash(orca terminal read *)",
+      "Bash(orca terminal send *)",
+      "Bash(orca terminal show *)",
+      "Bash(orca terminal split *)",
+      "Bash(orca terminal wait *)",
+      "Bash(orca worktree create *)",
+      "Bash(orca worktree current *)",
+      "Bash(orca worktree list *)",
+      "Bash(orca worktree ps *)",
+      "Bash(orca worktree show *)",
+      "Bash(unity command console get *)",
+      "Bash(unity command console status *)",
+      "Bash(unity command test run *)",
+      "Bash(unity command test status *)",
+      "Bash(unity recompile *)",
+      "Bash(unity status *)"
+    ],
+    "ask": [
+      "Bash(docker compose down *-v*)",
+      "Bash(gh api *)",
+      "Bash(gh issue close *)",
+      "Bash(gh issue comment *)",
+      "Bash(gh issue create *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr comment *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr review *)",
+      "Bash(gh release create *)",
+      "Bash(gh release delete *)",
+      "Bash(gh release edit *)",
+      "Bash(gh release upload *)",
+      "Bash(gh workflow run *)",
+      "Bash(git branch -D *)",
+      "Bash(git branch -d *)",
+      "Bash(git checkout *)",
+      "Bash(git clean *)",
+      "Bash(git merge *)",
+      "Bash(git push *)",
+      "Bash(git rebase *)",
+      "Bash(git reset *)",
+      "Bash(git restore *)",
+      "Bash(git stash clear *)",
+      "Bash(git stash drop *)",
+      "Bash(orca repo add *)",
+      "Bash(orca repo set *)",
+      "Bash(orca repo set-base-ref *)",
+      "Bash(orca skills get *)",
+      "Bash(orca terminal close *)",
+      "Bash(orca workspace cleanup run *)",
+      "Bash(orca worktree rm *)",
+      "Bash(orca worktree set *)",
+      "Bash(rm *)"
+    ],
+    "deny": [
+      "Bash(brew *)",
+      "Bash(chmod 777 *)",
+      "Bash(gh alias *)",
+      "Bash(gh auth *)",
+      "Bash(gh extension *)",
+      "Bash(gh repo delete *)",
+      "Bash(gh secret *)",
+      "Bash(kill -9 *)",
+      "Bash(kubectl *)",
+      "Bash(orca computer *)",
+      "Bash(orca eval *)",
+      "Bash(orca exec *)",
+      "Bash(orca plugin *)",
+      "Bash(pkill *)",
+      "Bash(ssh *)",
+      "Bash(sudo *)",
+      "Edit(.claude/settings*.json)",
+      "Edit(//etc/**)",
+      "Edit(~/.bashrc)",
+      "Edit(~/.claude/settings.json)",
+      "Edit(~/.claude/statusline.sh)",
+      "Edit(~/.zprofile)",
+      "Edit(~/.zshenv)",
+      "Edit(~/.zshrc)",
+      "Read(*.env)",
+      "Read(.env.*)",
+      "Read(!.env.example)",
+      "Read(!.env.sample)",
+      "Read(**/*.jks)",
+      "Read(**/*.key)",
+      "Read(**/*.keystore)",
+      "Read(**/*.mobileprovision)",
+      "Read(**/*.p12)",
+      "Read(**/*.p8)",
+      "Read(**/*.pem)",
+      "Read(**/*.pfx)",
+      "Read(**/credentials.json)",
+      "Read(**/secrets/**)",
+      "Read(**/service-account*.json)",
+      "Read(~/.aws/**)",
+      "Read(~/.azure/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.cos/reports/**)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.gem/credentials)",
+      "Read(~/.git-credentials)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(~/.pypirc)",
+      "Read(~/.ssh/**)",
+      "Read(~/Library/Keychains/**)",
+      "Read(~/Library/Preferences/shopify-cli-kit-nodejs/**)"
+    ],
+    "defaultMode": "auto",
+    "disableBypassPermissionsMode": "disable"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\" sound name \"Frog\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

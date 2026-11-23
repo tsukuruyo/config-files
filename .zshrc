@@ -1,9 +1,3 @@
-# 再読み込み (. ~/.zshrc) で PATH が重複して伸びないようにする
-typeset -U path PATH
-
-# brew upgrade は自分で実行する。brew install のついでに更新させない
-export HOMEBREW_NO_INSTALL_UPGRADE=1
-
 # --------------------------------------------------------------------------------
 # sheldon
 # --------------------------------------------------------------------------------
@@ -14,11 +8,6 @@ fi
 # --------------------------------------------------------------------------------
 # Terminal
 # --------------------------------------------------------------------------------
-export LANG=ja_JP.UTF-8
-export EDITOR=vim
-export VISUAL=vim
-export PAGER=less
-export LESSHISTFILE=-
 setopt no_beep
 unsetopt BEEP
 
@@ -30,8 +19,9 @@ autoload -Uz colors
 colors
 
 # aliases
-alias c='claude agents --cwd .'
-alias cx='\codex'
+alias c='\claude agents --cwd .'
+alias cos='\claude --name chief-of-staff --resume'
+alias cx='\codex agents'
 alias d='\docker'
 alias g='\git'
 alias kc='\kubectl'
@@ -155,17 +145,6 @@ if (( $+commands[fzf] )); then
 fi
 
 # --------------------------------------------------------------------------------
-# Android
-# --------------------------------------------------------------------------------
-export ANDROID_HOME=${HOME}/Library/Android/sdk
-export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator:${PATH}"
-
-# --------------------------------------------------------------------------------
-# .NET
-# --------------------------------------------------------------------------------
-export DOTNET_CLI_TELEMETRY_OPTOUT=1
-
-# --------------------------------------------------------------------------------
 # Google cloud SDK
 # --------------------------------------------------------------------------------
 # The next line updates PATH for the Google Cloud SDK.
@@ -177,20 +156,6 @@ fi
 if [ -f "${HOME}/google-cloud-sdk/completion.zsh.inc" ]; then
   . "${HOME}/google-cloud-sdk/completion.zsh.inc"
 fi
-
-export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-
-
-# --------------------------------------------------------------------------------
-# Unity CLI
-# --------------------------------------------------------------------------------
-if [ -f "${HOME}/.unity/env" ]; then
-  . "${HOME}/.unity/env"
-fi
-
-export UNITY_NO_CLI_INVOKED_TELEMETRY=1
-export UNITY_NO_CRASH_REPORT=1
-export UNITY_NO_UPDATE_CHECK=1
 
 # --------------------------------------------------------------------------------
 # LM Studio CLI (lms)
@@ -212,4 +177,3 @@ fi
 if [[ -f "${HOME}/.zshrc.local" ]]; then
   . "${HOME}/.zshrc.local"
 fi
-

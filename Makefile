@@ -15,8 +15,16 @@ plan:
 status:
 	mise bootstrap status
 
+install-etc:
+	# codex
+	sudo mkdir -p /etc/codex
+	sudo install -m 644 -o root -g wheel codex/requirements.toml /etc/codex/requirements.toml
+	# ClaudeCode
+	sudo mkdir -p "/Library/Application Support/ClaudeCode"
+	sudo install -m 644 -o root -g admin claude/managed-settings.json "/Library/Application Support/ClaudeCode/managed-settings.json"
+
 # Pull the latest config and apply it
-sync:
+sync: install-etc
 	git pull
 	mise bootstrap --verbose
 

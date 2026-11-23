@@ -1,10 +1,17 @@
 @~/.codex/AGENTS.md
 
-<!-- 共通の指示は、上で読み込む ~/.codex/AGENTS.md（このリポジトリの codex/AGENTS.md）に書く。ここには Claude Code だけのことを書く。このコメントは Claude Code に読み込まれない -->
+## サンドボックスの外で動かすコマンド
 
-# Claude Code
+gh、unity、docker build / compose / ps / logs / images、dotnet format、
+git の clone / fetch / pull / push / merge / switch / ls-remote / submodule update は、
+サンドボックスの外で動かす設定になっている。
 
-## ユーザーの判断を求めるとき
+- 1回の Bash 呼び出しには、そのコマンド1つだけを書く
+- `|`、`&&`、`;`、ファイルへのリダイレクト、`cd`、`$(...)`、`git -C` と組み合わせない
+  （組み合わせるとサンドボックスの中で実行され、認証やネットワークのエラーで失敗する）
+- 絞り込みはパイプではなくコマンド自身のオプションで行う
+  （例：`gh pr list --json number,title --jq '.[].title'`）
+- ブランチの作成と切り替えには `git checkout` ではなく `git switch` を使う
+- コンテナの操作は `docker compose` のサブコマンドで行う（`docker run` と `docker exec` は使えない）
+- 失敗しても、サンドボックスの外でのやり直しはできない。原因と、実行してほしいコマンドを伝える
 
-- 選択肢を示すときは AskUserQuestion ツールを使う
-- 自由入力（Other）で質問や確認が返ってきたら、次のターンでは AskUserQuestion を使わずに文章で答える。まだ選んでもらうことが残っていれば、その次のターンで改めて使う

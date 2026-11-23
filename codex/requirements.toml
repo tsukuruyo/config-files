@@ -1,0 +1,9 @@
+# sudo mkdir /etc/codex
+# cp requirements.toml /etc/codex/requirements.toml
+
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+allowed_approval_policies = ["on-request", "never"]
+allowed_web_search_modes = ["cached", "disabled"]
+
+[experimental_network]
+enabled = true

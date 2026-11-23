@@ -6,29 +6,55 @@ model_reasoning_effort = "high"
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 default_permissions = "guarded-workspace"
+# Read CLAUDE.md in directories that have no AGENTS.md.
+project_doc_fallback_filenames = ["CLAUDE.md"]
+# default_mode_request_user_input below is an under-development feature.
+suppress_unstable_features_warning = true
 
 [shell_environment_policy]
-exclude = ["GITHUB_TOKEN", "GH_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN"]
+exclude = ["GITHUB_TOKEN", "GH_TOKEN", "NPM_TOKEN", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN"]
 
-# The same credential read denies as claude/settings.json
+# The default permission profile for every project: no credential reads (the same
+# list as claude/settings.json). Network is enabled only so the in-app browser can
+# read pages; no domain is allowed, so the proxy (network_proxy below) still blocks
+# every connection from shell commands, loopback included.
+# With any "deny" entry active, Codex keeps every shell command in the sandbox,
+# so gh and remote git operations cannot work.
+# A project can extend this profile in its own .codex/config.toml. Unity projects
+# do, to add loopback for the Editor.
 [permissions.guarded-workspace]
+description = "No credential reads. Shell commands reach no host."
 extends = ":workspace"
 
+[permissions.guarded-workspace.network]
+enabled = true
+
 [permissions.guarded-workspace.filesystem]
-"~/.ssh" = "deny"
 "~/.aws" = "deny"
 "~/.azure" = "deny"
-"~/.kube" = "deny"
-"~/.gnupg" = "deny"
-"~/.git-credentials" = "deny"
+"~/.codex/auth.json" = "deny"
 "~/.config/gh" = "deny"
+"~/.docker/config.json" = "deny"
+"~/.gem/credentials" = "deny"
+"~/.git-credentials" = "deny"
+"~/.gnupg" = "deny"
+"~/.kube" = "deny"
+"~/.netrc" = "deny"
+"~/.npmrc" = "deny"
+"~/.pypirc" = "deny"
+"~/.ssh" = "deny"
+"~/Library/Keychains" = "deny"
 
 [permissions.guarded-workspace.filesystem.":workspace_roots"]
 "**/.env" = "deny"
 "**/*.env" = "deny"
 "**/.env.*" = "deny"
+"**/*.jks" = "deny"
 "**/*.key" = "deny"
+"**/*.keystore" = "deny"
+"**/*.mobileprovision" = "deny"
 "**/*.p12" = "deny"
+"**/*.p8" = "deny"
 "**/*.pem" = "deny"
 "**/*.pfx" = "deny"
 "**/credentials.json" = "deny"
@@ -40,3 +66,12 @@ followUpQueueMode = "steer"
 conversationDetailMode = "STEPS_PROSE"
 ambient-suggestions-enabled = false
 avatar-overlay-pet-visible = false
+
+[features]
+network_proxy = true
+default_mode_request_user_input = true
+# Keep the Mac awake while a turn is running in the terminal UI.
+prevent_idle_sleep = true
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "git-branch", "permissions", "context-remaining", "five-hour-limit", "weekly-limit"]
